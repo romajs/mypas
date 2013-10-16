@@ -1,42 +1,64 @@
+#include <lexer.h>
+void mypas(void);
+/******************************************************************************
+ **** Object declaration scope is defined next: *******************************
+ *****************************************************************************/
 /*
- * mypas -> PROGRAM ID ';' declrblk imprblk '.'
- *
- **** Object declaration scope is defined next:
- *
- * declrblk -> { specterms }
- *
- * specterm ->  VAR idlist ':' typespec ';'
- * 	      | sbrhead declrblk imprblk ';'
- *
+ * specification ->  vardeclr | sbrdeclr
+ */
+void specification(void);
+/*
+ * vardeclr ->  VAR idlist ':' typespec ';'
+ */
+void vardeclr(void);
+/*
+ * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
+ */
+void sbrdeclr(void);
+/*
  * idlist -> ID { ',' ID }
- *
- * typespec -> smptype | ARRAY '[' rangelst ']' OF typespec
- *
- * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING | CHAR 
- *
- * rangelst -> range { ',' range }
- *
- * range -> UINT [ DDOT UINT ]
- *
- * sbrhead -> PROCEDURE ID argdef ';'
- * 	    | FUNCTION ID argdef ':' smptype ';'
- *
+ */
+void idlist(void);
+/*
+ * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
+ */
+void typespec(void);
+/*
+ * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
+ */
+void smptype(void);
+/*
+ * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
+ */
+void sbrhead(void);
+/*
  * argdef -> [ '(' arglist ')' ]
- *
+ */
+void argdef(void);
+/*
  * arglist -> argspc { ';' argspc }
- *
+ */
+void arglist(void);
+/*
  * argspc -> [ VAR ] idlist ':' smptype
- *
+ */
+void arspc(void);
+/******************************************************************************
  **** Imperative scope is defined hereafter:
- *
- * imprblk -> BEGIN stmtlst END
- *
+ *****************************************************************************/
+/*
+ * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
+ */
+void stmt(void);
+/*
+ * stmblk -> BEGIN stmtlst END
+ */
+void stmblk(void);
+/*
  * stmtlst -> stmt { ';' stmt }
- *
- * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt
- * 	 | idstmt | imprblk
- *
- * ifstmt -> IF expr THEN stmt [ ELSE stmt ]
+ */
+void stmtlst(void);
+/* ifstmt -> IF expr THEN stmt [ ELSE stmt ]
  *
  */
 void ifstmt(void);
@@ -52,33 +74,28 @@ void ifstmt(void);
  * term -> fact { mulop fact }
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
- *
- * whlstmt -> WHILE expr DO stmt
- * forstmt -> FOR ID indexing ':=' expr [DOWN]TO expr DO stmt
- * repstmt -> REPEAT stmtlst UNTIL expr
- * 
- * 	instances for idstmt:
- *
- * 	abacaxi := pera * 3 + goiaba
- *
- * 	xyz[i,j][k] := xyz[j+1,i-1][k]
- *
- * 	Writeln
- *
- * 	Blurr(Image, Width * 3)
- *
- * idstmt -> ID [ parm | indexing ':=' expr ]
- *
- * 	remark:
- *
- * 	FOLLOW(idstmt) = { ';', END }
- *
- * 	FOLLOW(ID) { '(', '[', ':=' } |_| FOLLOW(idstmt)
- *
- * parm -> '(' exprlst ')'
- *
- * explst -> expr { ',' expr }
- *
- * indexing -> { '[' exprlst ']' }
- *
  */
+/*
+ * whlstmt -> WHILE expr DO stmt
+ */
+void whlstmt(void);
+/*
+ * forstmt -> FOR ID '[' expr ']' ':=' expr DOWNTO|TO expr DO stmt
+ */
+void forstmt(void);
+/*
+ * repstmt -> REPEAT stmtlst UNTIL expr
+ */
+void repstmt(void);
+/*
+ * idstmt -> ID [ parm | { '[' expr ']' } ':=' expr ]
+ */
+void idstmt(void);
+/*
+ * parm -> '(' exprlst ')'
+ */
+void param(void);
+/*
+ * exprlst -> expr { ',' expr }
+ */
+void exprlst(void);

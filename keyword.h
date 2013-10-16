@@ -1,5 +1,6 @@
 enum{
 	BEGIN=0x10000,
+	ATTR,
 	NOT,
 	OR,
 	AND,

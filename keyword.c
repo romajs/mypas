@@ -3,6 +3,7 @@
 
 char const *keyword[]={
 	"BEGIN",
+	"ATTR",
 	"NOT",
 	"OR",
 	"AND",
