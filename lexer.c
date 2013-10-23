@@ -2,7 +2,7 @@
 
 token_t lookahead;
 
-char lexeme[MAX_ID_LEN];
+char lexeme[MAX_ID_SIZE];
 
 int lineno = 1;
 
@@ -44,7 +44,7 @@ token_t isID(FILE *tape)
 		int i = 0;
 		lexeme[i++] = toupper(head);
 		while (isalnum(head = getc(tape))) {
-			if(i + 1 < MAX_ID_LEN) lexeme[i++] = toupper(head);
+			if(i + 1 < MAX_ID_SIZE) lexeme[i++] = toupper(head);
 		}
 		lexeme[i] = 0;
 		ungetc(head, tape);
@@ -56,7 +56,7 @@ token_t isID(FILE *tape)
 	return 0;
 }
 
-// contantes num�ricas: integers ou ponto flutuante (double)
+// contantes numéricas: integers ou ponto flutuante (double)
 token_t isNUM(FILE *tape)
 {
 	token_t head;
@@ -76,6 +76,7 @@ token_t isNUM(FILE *tape)
 				} else {
 					//exit_with_error(MAX_DIG_OVERFLOW);
 				}
+				// TODO: terminar PONTO FLUTUANTE
 			}
 		}
 		lexeme[i] = 0;
@@ -86,14 +87,14 @@ token_t isNUM(FILE *tape)
 	return 0;
 }
 
-// fun��o que l� os caracteres da fita e tenta transformar em um s�mbolo da
-// gram�tica, para cada uma das fun��es acima (poss�veis 'tokens')
-// caso nenhuma delas seja satisfeita apenas retorna o �ltimo caractere lido.
+// função que lê os caracteres da fita e tenta transformar em um símbolo da
+// gramática, para cada uma das funções acima (possíveis 'tokens')
+// caso nenhuma delas seja satisfeita apenas retorna o último caractere lido.
 token_t gettoken(FILE *tape)
 {
 	token_t token;
 
-	//if(token = isEOF(tape)) goto END_TOKEN;
+	if(token = isEOF(tape)) goto END_TOKEN;
 
 	skipspaces(tape);
 
@@ -113,7 +114,7 @@ END_TOKEN:
  * parser-to-lexer interface
  */
 
-// fun��o que consome o 'token' atual e obt�m o pr�ximo 'token' da fita
+// função que consome o 'token' atual e obtém o próximo 'token' da fita
 void match(token_t predicted) {
   debug( "lookahead = %d | predicted = %d\n", lookahead, predicted);
   if(lookahead == predicted) {
@@ -127,7 +128,7 @@ void match(token_t predicted) {
   }
 }
 
-// fun��o que devole o 'token' & 'lexeme' atual, e os redefine (volta ao anterior)
+// função que devole o 'token' & 'lexeme' atual, e os redefine (volta ao anterior)
 void unmatch(token_t previous, const char* temp) {
 	debug( "(unmatch) previous = %d, lexeme = \"%s\"\n", lookahead, lexeme);
 	int i;
@@ -145,4 +146,3 @@ void unmatch(token_t previous, const char* temp) {
 	strcpy(lexeme, temp);
 	debug( "lookahead = %d, lexeme = \"%s\"\n", lookahead, lexeme);
 }
-

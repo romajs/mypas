@@ -1,4 +1,11 @@
+#include <stdio.h>
+
 #include <lexer.h>
+#include <symtab.h>
+
+extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
+extern int id_count;
+
 void mypas(void);
 /******************************************************************************
  **** Object declaration scope is defined next: *******************************
@@ -22,11 +29,11 @@ void idlist(void);
 /*
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
-void typespec(void);
+int typespec(void);
 /*
  * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
  */
-void smptype(void);
+int smptype(void);
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
@@ -75,6 +82,7 @@ void ifstmt(void);
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
+void expr(void);
 /*
  * whlstmt -> WHILE expr DO stmt
  */
@@ -99,3 +107,12 @@ void param(void);
  * exprlst -> expr { ',' expr }
  */
 void exprlst(void);
+
+/*
+ * EXTERN DECLARATIONS
+ */
+extern FILE *source, destination;
+
+extern void match(token_t);
+
+int symtab_add_list(int, char const [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int);

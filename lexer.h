@@ -7,10 +7,10 @@
 #include <mytype.h>
 #include <tokens.h>
 
-extern FILE *source;
-
-extern FILE *object;
+extern FILE* source, destination;
 
 extern token_t lookahead;
 
 extern char lexeme[];
+
+extern int iskeyword(char const *);

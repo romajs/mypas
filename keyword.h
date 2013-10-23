@@ -29,3 +29,5 @@ enum{
 	DOWNTO,
 	END
 };
+
+int iskeyword(char const *query);

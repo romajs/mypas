@@ -1,4 +1,9 @@
 #include <parser.h>
+
+#define 	GLOBAL	0
+#define	LOCAL		1
+/* semantic variable*/int scope;/**/
+
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
  */
@@ -7,8 +12,9 @@ void mypas(void)
 	match(PROGRAM);
 	match(ID);
 	match(';');
+	/* semantic action */ scope = GLOBAL;/**/
 m0:
-	if(lookahead == VAR || lookahead == PROCEDURE || lookahead == FUNCTION) {
+	if(lookahead != BEGIN) {
 		specification();
 		goto m0;
 	}
@@ -22,32 +28,40 @@ m0:
  * specification ->  vardeclr | sbrdeclr
  */
 void specification(void)
-{
+{	
+	/* semantic action */ scope = LOCAL;
+	int symtab_first_entry = symtab_next_entry;/**/
 	if(lookahead == VAR ) {
 		vardeclr();
 	} else {
 		sbrdeclr();
 	}	
+	/* semantic action */ scope = GLOBAL;
+	symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * vardeclr ->  VAR idlist ':' typespec ';'
  */
 void vardeclr(void)
 {
+	/* semantic action */int type;/**/
 	match(VAR);
-	idlist();
+	idlist(); /* -> variable-name list*/
 	match(':');
-	typespec();
+	type = typespec();/* ->simple-type attribute*/
 	match(';');
+	/* semantic rule: register the variable list with the ame type
+	 * in the symbol table
+	 */symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
  */
-void sbrdeclr(void)
+void sbrdeclr(void)	
 {
 	sbrhead();
 sb0:
-	if(lookahead == VAR) {
+	if(lookahead != BEGIN) {
 		vardeclr();
 		goto sb0;
 	}
@@ -57,9 +71,13 @@ sb0:
 /*
  * idlist -> ID { ',' ID }
  */
+char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
+int id_count = 0;
 void idlist(void)
 {
+	/* semantic action */ id_count = 0; /**/
 il0:
+	/* semantic action */ strcpy(id_list[id_count++], lexeme); /**/
 	match(ID);
 	if(lookahead == ',') {
 		match(',');	
@@ -69,34 +87,44 @@ il0:
 /*
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
-void typespec(void)
+typespec(void)
 {
+ts0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
 		match(UINT); // ???
 		match(']');
 		match(OF);
-		typespec();
+		goto ts0;
 	}
 	else {
-		smptype();
+		return smptype();
 	}
 }
 /*
  * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
  */
-void smptype(void)
+int smptype(void)
 {
 	switch(lookahead) {
 		case INTEGER:
+			match(INTEGER);
+			return 1;
 		case REAL:
+			match(REAL);
+			return 2;
 		case DOUBLE:
+			match(DOUBLE);
+			return 3;
 		case BOOLEAN:
+			match(BOOLEAN);
+			return 4;
 		case STRING:
-			match(lookahead);
+			match(STRING);
+			return 5;
 		default:
-			;
+			return -1;
 	}
 }
 /*
@@ -230,6 +258,10 @@ void ifstmt(void)
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
+void expr(void) {
+	// TODO
+}
+
 /*
  * whlstmt -> WHILE expr DO stmt
  */
