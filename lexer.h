@@ -15,4 +15,4 @@ extern token_t lookahead;
 
 extern char lexeme[];
 
-extern int iskeyword(char const *);
+extern keyword iskeyword(char const *);

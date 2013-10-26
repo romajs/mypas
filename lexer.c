@@ -43,13 +43,14 @@ token_t isID(FILE *tape)
 	if (isalpha(head = getc(tape))) {
 		int i = 0;
 		lexeme[i++] = toupper(head);
-		while (isalnum(head = getc(tape))) {
-			if(i + 1 < MAX_ID_SIZE) lexeme[i++] = toupper(head);
+		while (isalnum(head = getc(tape)) && i + 1 < MAX_ID_SIZE) {
+      lexeme[i++] = toupper(head);
 		}
 		lexeme[i] = 0;
 		ungetc(head, tape);
-		if(head = iskeyword(lexeme))
+		if(head = iskeyword(lexeme)) {
 			return head;
+    }
 		return ID;
 	}
 	ungetc(head, tape);
@@ -92,7 +93,8 @@ token_t isNUM(FILE *tape)
 // caso nenhuma delas seja satisfeita apenas retorna o último caractere lido.
 token_t gettoken(FILE *tape)
 {
-	token_t token;
+	token_t token;  
+  debug("gettoken, ");
 
 	if(token = isEOF(tape)) goto END_TOKEN;
 
@@ -107,23 +109,30 @@ token_t gettoken(FILE *tape)
 	lexeme[1] = 0;  
 
 END_TOKEN:  
-	debug( "lookahead = %d, \"%c\", lexeme = \"%s\"\n", token, token, lexeme);  
+	debug("lookahead: \"%c\", ", token);
+  debug("lexeme: \"%s\", ", lexeme); 
+  debug("%d!\n", token);
 	return token;
 }
 /**************************************************************************
- * parser-to-lexer interface
- */
+ *** parser-to-lexer interface ********************************************
+ *************************************************************************/
 
 // função que consome o 'token' atual e obtém o próximo 'token' da fita
 void match(token_t predicted) {
-  debug( "lookahead = %d | predicted = %d\n", lookahead, predicted);
+  debug("match, ");
+  debug("lookahead: %d, ", lookahead);
+  debug("predicted: %d, ", predicted);
+  debug("lexeme: \"%s\", ", lexeme);
   if(lookahead == predicted) {
     if(lookahead != EOF) {
+      debug("MATCH!\n");
       lookahead = gettoken(source);
     } else {
-      debug( "No more tokens in tape to get!\n");
+      debug("No more tokens in tape to get!\n");
      }
   } else {
+    debug("FAILED!\n");
     //exit_with_error(TOKEN_MISMATCH);
   }
 }

@@ -9,10 +9,10 @@
  */
 void mypas(void)
 {
+  debug("mypas\n");
 	// clear everything before start
 	lookahead = EOF;
 	lexeme[0] = 0;
-	fflush(source);
 
   // call gramar initial symbol
 	lookahead = gettoken(source);

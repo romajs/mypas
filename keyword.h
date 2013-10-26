@@ -1,4 +1,4 @@
-enum{
+enum keywords {
 	BEGIN=0x10000,
 	ATTR,
 	NOT,
@@ -30,4 +30,6 @@ enum{
 	END
 };
 
-int iskeyword(char const *query);
+typedef enum keywords keyword;
+
+keyword iskeyword(char const *query);

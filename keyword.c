@@ -1,7 +1,7 @@
 #include <string.h>
 #include <keyword.h>
 
-char const *keyword[]={
+char const *keyword_lexemes[]={
 	"BEGIN",
 	"ATTR",
 	"NOT",
@@ -33,11 +33,11 @@ char const *keyword[]={
 	"END",
 };
 
-iskeyword(char const *query)
+keyword iskeyword(char const *query)
 {
-	int i;
-	for(i=BEGIN;i<END+1;i++)
-		if(strcmp(query,keyword[i-BEGIN])==0)return 1;
+	keyword k;
+	for(k = BEGIN; k < END + 1; k++)
+		if(strcmp(query, keyword_lexemes[k - BEGIN]) == 0)
+      return k;
 	return 0;
 }
-
