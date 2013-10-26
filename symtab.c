@@ -16,13 +16,13 @@ symtab_lookup(char const *query)
 	return 0;
 }
 
-symtab_add_list(int n, char const symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int type, int offsettype)
+symtab_add_list(int n, char const *symlist[], int type, int offsettype)
 {
   int i;
   for(i=0;i<n;i++){
     int entry = symtab_lookup(symlist[i]);
     if(entry && symtab[entry].offsettype>=offsettype){
-	    fprintf(destination, "%s already defined in current scope\n",symlist[i]);
+	    fprintf(object, "%s already defined in current scope\n",symlist[i]);
 	    return -1;
     }
     strcpy(symtab[symtab_next_entry].name, symlist[i]);

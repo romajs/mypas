@@ -8,7 +8,7 @@ extern int id_count;
 
 void mypas(void);
 /******************************************************************************
- **** Object declaration scope is defined next: *******************************
+ **** object declaration scope is defined next: *******************************
  *****************************************************************************/
 /*
  * specification ->  vardeclr | sbrdeclr
@@ -49,7 +49,7 @@ void arglist(void);
 /*
  * argspc -> [ VAR ] idlist ':' smptype
  */
-void arspc(void);
+void argspc(void);
 /******************************************************************************
  **** Imperative scope is defined hereafter:
  *****************************************************************************/
@@ -111,8 +111,9 @@ void exprlst(void);
 /*
  * EXTERN DECLARATIONS
  */
-extern FILE *source, destination;
+extern FILE *source;
+extern FILE *object;
 
 extern void match(token_t);
 
-int symtab_add_list(int, char const [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int);
+extern int symtab_add_list(int, char const *[], int, int);

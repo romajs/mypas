@@ -22,7 +22,7 @@ m0:
 	match('.');
 }	
 /******************************************************************************
- **** Object declaration scope is defined next: *******************************
+ **** object declaration scope is defined next: *******************************
  *****************************************************************************/
 /*
  * specification ->  vardeclr | sbrdeclr
@@ -171,7 +171,7 @@ al0:
 /*
  * argspc -> [ VAR ] idlist ':' smptype
  */
-void arspc(void)
+void argspc(void)
 {
 	if(lookahead == VAR)
 		match(VAR);
@@ -189,7 +189,7 @@ void stmt(void)
 {
 	switch(lookahead){
 		case BEGIN:
-			stmtblk();
+			stmblk();
 			break;
 		case IF:
 			ifstmt();

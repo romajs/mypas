@@ -7,7 +7,9 @@
 #include <mytype.h>
 #include <tokens.h>
 
-extern FILE* source, destination;
+extern FILE* source;
+
+extern FILE* object;
 
 extern token_t lookahead;
 

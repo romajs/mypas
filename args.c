@@ -22,6 +22,6 @@ void match_args(int argc, char *argv[]) {
 	}
 	
 	if(T_FLAG) {
-		tests();
+		//tests(); NOT_IMPLEMENTED_YET
 	}
 }

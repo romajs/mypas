@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 int D_FLAG; // flag de debug
 int T_FLAG; // flag de testes
 

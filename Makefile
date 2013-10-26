@@ -1,6 +1,6 @@
 CFLAGS=-I. -g
 
-relloc=lexer.o parser.o keyword.o mypas.o symtab.o args.o debug.o
+relloc=keyword.o symtab.o lexer.o parser.o args.o debug.o mypas.o
 
 mypas: $(relloc)
 	$(CC) -o $@ $^

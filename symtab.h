@@ -23,6 +23,8 @@ extern int symtab_next_entry;
 
 int symtab_lookup(char const *);
 
-int symtab_add_list(int, char const [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int);
+int symtab_add_list(int, char const *[], int, int);
 
-extern FILE* source, destination;
+extern FILE *source;
+
+extern FILE *object;

@@ -14,7 +14,7 @@ void debug(const char *format, ...) {
 	va_end(arg);
 }
 
-void debug_symtab(const char table[MAX_SYM_TAB][MAX_ID_LEN], const double *value, int size) {
+void debug_symtab(const char table[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE], const double *value, int size) {
 	if(!out) return;
 	debug("SYMTAB(size = %d):\n", size);
 	int i;
