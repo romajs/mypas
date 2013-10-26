@@ -7,7 +7,7 @@ int T_FLAG; // flag de testes
 
 extern FILE *object;
 
-extern void set_debug(FILE *);
+extern void set_debug(int);
 
 void match_args(int, char *[]);
 

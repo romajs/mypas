@@ -18,7 +18,7 @@ void match_args(int argc, char *argv[]) {
 	}
 
 	if(D_FLAG) {
-		set_debug(object);
+		set_debug(1);
 	}
 	
 	if(T_FLAG) {

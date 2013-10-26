@@ -2,8 +2,12 @@
 
 FILE *out;
 
-void set_debug(FILE *f) {
-	out = f;
+void set_debug(int flag) {  
+  if(flag) {
+    out = stdout;
+  } else {
+    out = NULL;
+  }
 }
 
 void debug(const char *format, ...) {

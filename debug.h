@@ -3,7 +3,7 @@
 
 #include <tokens.h>
 
-void set_debug(FILE *);
+void set_debug(int);
 
 void debug(const char *, ...);
 
