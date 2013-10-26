@@ -5,18 +5,19 @@ int done = 0; // total de testes sucedidos
 
 test(const char* filename)
 {  
-  int status;
+  /*int status;
   pid_t child;
   
   // inicia novo processo, para não "sujar" as pilhas, etc...
-  if(!(child = fork())) {
-    printf("Testing: \"%s\"\n", filename);
-    source = fopen(filename, "rt");
+  if(!(child = fork())) {*/
+    fprintf(object, "Testing: \"%s\"\n", filename);
+    source = fopen(filename, "r+");
     mypas();
-  }
+    fclose(source);
+  /*}
   else { // aguardo o término do filho
     waitpid(child, &status, 0);
-  }
+  }*/
 }
 
 // função que descreve os teste a serem executados
