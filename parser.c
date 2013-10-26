@@ -9,6 +9,14 @@
  */
 void mypas(void)
 {
+	// clear everything before start
+	lookahead = EOF;
+	lexeme[0] = 0;
+	fflush(source);
+
+  // call gramar initial symbol
+	lookahead = gettoken(source);
+
 	match(PROGRAM);
 	match(ID);
 	match(';');

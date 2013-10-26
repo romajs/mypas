@@ -51,7 +51,7 @@ void arglist(void);
  */
 void argspc(void);
 /******************************************************************************
- **** Imperative scope is defined hereafter:
+ *** Imperative scope is defined hereafter: ***********************************
  *****************************************************************************/
 /*
  * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
@@ -108,10 +108,12 @@ void param(void);
  */
 void exprlst(void);
 
-/*
- * EXTERN DECLARATIONS
- */
+/******************************************************************************
+ *** EXTERN DECLARATIONS ******************************************************
+ *****************************************************************************/
+ 
 extern FILE *source;
+
 extern FILE *object;
 
 extern void match(token_t);
