@@ -21,8 +21,8 @@ double recall(char const *variable) {
     
 		if(strcmp(SYMTAB[i], variable) == 0)
 			return i;
-	}*/
-	err(FATAL, SYNTATIC, "Id not declared");
+	}
+	err(FATAL, SYNTATIC, "Id not declared");*/
 	return -1;
 }
 
@@ -33,8 +33,8 @@ double getvalue(char const *variable) {
   for(i = 0; i <= nextentry; i++) {
 		if(strcmp(SYMTAB[i], variable) == 0)
 			return acc[i];
-	}*/
-	err(FATAL, SYNTATIC, "Id not declared");
+	}
+	err(FATAL, SYNTATIC, "Id not declared");*/
 	return 0.00;
 }
 
@@ -77,6 +77,7 @@ void exec_oper(void) {
 
 double expr(void)
 { 
+  debug("expr\n");
 	memset(&oper[0], 0, sizeof(oper));
 	memset(&operand[0], 0, sizeof(operand));	
 	E_lvl = -1, T_lvl = -1, F_lvl = -1;
@@ -100,11 +101,12 @@ double expr(void)
 
 	switch(lookahead) {
     case ID:
-      if(recall(lexeme) > -1) {
+      match(ID);
+      /*if(recall(lexeme) > -1) {
         push_operand(getvalue(lexeme)); // deve empilhar o valor da variável de SYMTAB
       } else {
         err(FATAL, SYNTATIC, "Id not declared\n"); // caso contrário, a 'ID' não foi declarada
-      }
+      }*/
       break;
     case NUM: // INT | REAL | DOUBLE
       push_operand(atof(lexeme)); // empilha o valor da constante
@@ -154,8 +156,6 @@ double expr(void)
 		match(')');
 		goto _F;
 	}
-
-	match(EOF); 
 
 	debug( "(pop) operand[%d] = %.2f\n", sp, operand[sp]);
 	return operand[sp--];
