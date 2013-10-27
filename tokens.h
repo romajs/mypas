@@ -7,6 +7,19 @@ enum {
 	UINT
 };
 
+enum errors {
+  INFO = 0x100,
+  WARN,
+  FATAL,
+  OTHER
+};
+
+enum natures {
+  LEXICAL = 0x100,
+  SYNTATIC,
+  SEMANTIC,
+};
+
 #define   		MAX_ID_SIZE              				32	// Tamanho máximo dos identificadores
 #define		MAX_IND_SIZE						 1
 #define		MAX_ARGS_SIZE				0x100
