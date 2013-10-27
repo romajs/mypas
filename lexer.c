@@ -101,7 +101,7 @@ token_t isSTRING(FILE *tape)
 
 	if((head = getc(tape)) == '\'') {
 		int i = 0;
-		while((head = getc(tape)) == '\''){
+		while((head = getc(tape)) != '\''){
 			if(i + 1 < MAX_STR_LEN) {
 				lexeme[i++] = head;		
       } else {
@@ -109,7 +109,6 @@ token_t isSTRING(FILE *tape)
 			}
 		}
     lexeme[i] = 0;
-    ungetc(head, tape);
     return STR;
 	}
 	ungetc(head, tape);
@@ -140,7 +139,7 @@ token_t isATTR(FILE *tape)
 token_t gettoken(FILE *tape)
 {
 	token_t token;  
-  debug("gettoken, ");
+  debug("gettoken: ");
 
 	if(token = isEOF(tape)) goto END_TOKEN;
 
@@ -169,10 +168,10 @@ END_TOKEN:
 
 // função que consome o 'token' atual e obtém o próximo 'token' da fita
 void match(token_t predicted) {
-  debug("match, ");
+  debug("match? ");
   debug("lookahead: %d, ", lookahead);
   debug("predicted: %d, ", predicted);
-  debug("lexeme: \"%s\", ", lexeme);
+  debug("lexeme: \"%s\" ", lexeme);
   if(lookahead == predicted) {
     if(lookahead != EOF) {
       debug("MATCH!\n");
@@ -188,19 +187,23 @@ void match(token_t predicted) {
 
 // função que devole o 'token' & 'lexeme' atual, e os redefine (volta ao anterior)
 void unmatch(token_t previous, const char* temp) {
-	debug( "(unmatch) previous = %d, lexeme = \"%s\"\n", lookahead, lexeme);
+	debug("unmatch: { ");  
+  debug("previous: %d, ", previous);
+  debug("lexeme: \"%s\"; ", temp);
+  debug("lookahead: %d, ", lookahead);
+  debug("lexeme: \"%s\"} ", lexeme);
 	int i;
 	if(lookahead != EOF) {
-		debug( "size(%s) = %u, ungetc: \"", lexeme, strlen(lexeme));
 		for(i = strlen(lexeme) - 1; i >= 0; i--) {
-			debug( "%c", lexeme[i]);
 			ungetc(lexeme[i], source);
-		}    
-		debug( "\"\n");  
+		}    		
 	} else {
 		ungetc('\n', source);
 	}
 	lookahead = previous;
 	strcpy(lexeme, temp);
-	debug( "lookahead = %d, lexeme = \"%s\"\n", lookahead, lexeme);
+  debug("DONE!\n");  
+  debug("result: { "); 
+	debug("lookahead: %d, ", lookahead);
+  debug("lexeme: \"%s\"} ", lexeme);
 }
