@@ -1,5 +1,49 @@
 #include <mycalc.h>
 
+// mulop -> '*' | '/' | DIV | MOD | AND
+ismulop(const token_t token)
+{
+  switch(token) {
+    case '*':
+    case '/':
+    case DIV:
+    case MOD:
+    case AND:
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+// addop -> '+' | '-' | OR
+isaddop(const token_t token)
+{
+  switch(token) {
+    case '+':
+    case '-':
+    case OR:
+      return 1;
+    default:
+      return 0;
+   }
+}
+
+// relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+isrelop(const token_t token)
+{
+  switch(token) {
+    case '>':
+    case GEQ:
+    case '<':
+    case LEQ:
+    case '=':
+    case NEQ:
+      return 1;
+    default:
+      return 0;
+   }
+}
+
 // função que calcula o resultado entre duas variávies dado seu operador
 double calc(double x, double y, int op) { 
   double result = 0.00;

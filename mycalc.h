@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include <mytype.h>
 #include <tokens.h>
+#include <keyword.h>
 
 #ifndef PARSER_H
 #define PARSER_H
@@ -56,6 +58,15 @@ int can_oper;
  *   \-----> '(' ----> (E) ----> ')' -----/
  * 
  */
+
+// mulop -> '*' | '/' | DIV | MOD | AND 
+int ismulop(const token_t);
+
+// addop -> '+' | '-' | OR
+int isaddop(const token_t);
+
+// relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+int isrelop(const token_t);
  
 double expr(void);
 
