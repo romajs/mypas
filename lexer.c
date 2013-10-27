@@ -99,16 +99,18 @@ token_t isSTRING(FILE *tape)
 {
 	token_t head;
 
-	if((head = getc(tape)) == "\"") {
+	if((head = getc(tape)) == '\'') {
 		int i = 0;
-		while((head = getc(tape)) == "\""){
+		while((head = getc(tape)) == '\''){
 			if(i + 1 < MAX_STR_LEN) {
 				lexeme[i++] = head;		
-      }
+      } else {
+				err(FATAL, LEXICAL, "Max String Length Overflow\n");
+			}
 		}
     lexeme[i] = 0;
     ungetc(head, tape);
-    return STRING;
+    return STR;
 	}
 	ungetc(head, tape);
 	return 0;
@@ -116,18 +118,19 @@ token_t isSTRING(FILE *tape)
 
 token_t isATTR(FILE *tape)
 {
-	token_t head;
+	token_t t1, t2;
 
-	if((head = getc(tape)) == ":") {
+	if((t1 = getc(tape)) == ':') {
 		int i = 0;
-    lexeme[i++] = head;	
-    if((head = getc(tape)) == "=") {
-      lexeme[i++] = head;		
+    lexeme[i++] = t1;	
+    if((t2 = getc(tape)) == '=') {
+      lexeme[i++] = t2;		
       lexeme[i] = 0;
       return ATTR;
     }
+    ungetc(t2, tape);
 	}
-	ungetc(head, tape);
+	ungetc(t1, tape);
 	return 0;
 }
 
