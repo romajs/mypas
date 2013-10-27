@@ -2,6 +2,7 @@
 
 #include <lexer.h>
 #include <symtab.h>
+#include <mycalc.h>
 
 extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 extern int id_count;
@@ -82,7 +83,8 @@ void ifstmt(void);
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
-void expr(void);
+extern double expr(void);
+
 /*
  * whlstmt -> WHILE expr DO stmt
  */
@@ -119,3 +121,5 @@ extern FILE *object;
 extern void match(token_t);
 
 extern int symtab_add_list(int, char const *[], int, int);
+
+extern void err(int, int, const char *, ...);

@@ -37,21 +37,23 @@ m0:
  */
 void specification(void)
 {	
+  debug("specification\n");
 	/* semantic action */ scope = LOCAL;
-	int symtab_first_entry = symtab_next_entry;/**/
-	if(lookahead == VAR ) {
+	//int symtab_first_entry = symtab_next_entry;/**/
+	if(lookahead != BEGIN ) {
 		vardeclr();
 	} else {
 		sbrdeclr();
 	}	
 	/* semantic action */ scope = GLOBAL;
-	symtab_next_entry = symtab_first_entry;/**/
+	//symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * vardeclr ->  VAR idlist ':' typespec ';'
  */
 void vardeclr(void)
 {
+  debug("vardeclr\n");
 	/* semantic action */int type;/**/
 	match(VAR);
 	idlist(); /* -> variable-name list*/
@@ -60,13 +62,14 @@ void vardeclr(void)
 	match(';');
 	/* semantic rule: register the variable list with the ame type
 	 * in the symbol table
-	 */symtab_add_list(id_count, id_list, type, scope);/**/
+	 *///symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
  */
 void sbrdeclr(void)	
 {
+  debug("sbrdeclr\n");
 	sbrhead();
 sb0:
 	if(lookahead != BEGIN) {
@@ -83,6 +86,7 @@ char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 int id_count = 0;
 void idlist(void)
 {
+  debug("idlist\n");
 	/* semantic action */ id_count = 0; /**/
 il0:
 	/* semantic action */ strcpy(id_list[id_count++], lexeme); /**/
@@ -266,9 +270,7 @@ void ifstmt(void)
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
-void expr(void) {
-	// TODO
-}
+// IMPLEMENTED in MYCALC.C
 
 /*
  * whlstmt -> WHILE expr DO stmt
