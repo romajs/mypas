@@ -33,14 +33,14 @@ m0:
  **** object declaration scope is defined next: *******************************
  *****************************************************************************/
 /*
- * specification ->  vardeclr | sbrdeclr
+ * specification -> vardeclr | sbrdeclr
  */
 void specification(void)
 {	
   debug("specification\n");
 	/* semantic action */ scope = LOCAL;
 	//int symtab_first_entry = symtab_next_entry;/**/
-	if(lookahead != BEGIN ) {
+	if(lookahead == VAR ) {
 		vardeclr();
 	} else {
 		sbrdeclr();
@@ -101,6 +101,7 @@ il0:
  */
 typespec(void)
 {
+  debug("typespec\n");
 ts0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
@@ -119,6 +120,7 @@ ts0:
  */
 int smptype(void)
 {
+  debug("smptype\n");
 	switch(lookahead) {
 		case INTEGER:
 			match(INTEGER);
@@ -144,6 +146,7 @@ int smptype(void)
  */
 void sbrhead(void)
 {
+  debug("sbrhead\n");
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
 		match(ID);
@@ -162,6 +165,7 @@ void sbrhead(void)
  */
 void argdef(void)
 {
+  debug("argdef\n");
 	if(lookahead == '(') {
 		match('(');
 		arglist();
@@ -173,6 +177,7 @@ void argdef(void)
  */
 void arglist(void)
 {
+  debug("arglist\n");
 al0:
 	argspc();
 	if(lookahead == ';') {
@@ -185,6 +190,7 @@ al0:
  */
 void argspc(void)
 {
+  debug("argspc\n");
 	if(lookahead == VAR)
 		match(VAR);
 	idlist();
@@ -199,6 +205,7 @@ void argspc(void)
  */
 void stmt(void)
 {
+  debug("stmt\n");
 	switch(lookahead){
 		case BEGIN:
 			stmblk();
@@ -227,6 +234,7 @@ void stmt(void)
  */
 void stmblk(void)
 {
+  debug("stmblk\n");
 	match(BEGIN);
 	stmtlst();
 	match(END);
@@ -236,6 +244,7 @@ void stmblk(void)
  */
 void stmtlst(void)
 {
+  debug("stmlst\n");
 s0:
 	stmt();
 	if(lookahead == ';') {
@@ -248,6 +257,7 @@ s0:
  */
 void ifstmt(void)
 {
+  debug("ifstmt\n");
 	match(IF);
 	expr();
 	match(THEN); 
@@ -277,6 +287,7 @@ void ifstmt(void)
  */
 void whlstmt(void)
 {
+  debug("whlstmt\n");
 	match(WHILE);
 	expr();
 	match(DO);
@@ -287,6 +298,7 @@ void whlstmt(void)
  */
 void forstmt(void)
 {
+  debug("forstmt\n");
 	match(FOR);
 	match(ID);
 	if(lookahead == '[') {
@@ -310,6 +322,7 @@ void forstmt(void)
  */
 void repstmt(void)
 {
+  debug("repstmt\n");
 	match(REPEAT);
 	stmtlst();
 	match(UNTIL);
@@ -320,6 +333,7 @@ void repstmt(void)
  */
 void idstmt(void)
 {
+  debug("idstmt\n");
 	match(ID);
 	if(lookahead == '(') {
 		param();
@@ -338,6 +352,7 @@ void idstmt(void)
  */
 void param(void)
 {
+  debug("param\n");
 	match('(');
 	exprlst();
 	match(')');
@@ -347,6 +362,7 @@ void param(void)
  */
 void exprlst(void)
 {
+  debug("exprlst\n");
 e0:
 	expr();
 	if(lookahead == ',') {
