@@ -6,9 +6,12 @@
 	ENUM(PROGRAM) \
 	ENUM(VAR) \
 	ENUM(ATTR) \
-  ENUM(GEQ) \
-  ENUM(LEQ) \
+  ENUM(EQ) \
   ENUM(NEQ) \
+  ENUM(GRT) \
+  ENUM(GEQ) \
+  ENUM(LSR) \
+  ENUM(LEQ) \
 	ENUM(AND) \
 	ENUM(OR) \
 	ENUM(DIV) \

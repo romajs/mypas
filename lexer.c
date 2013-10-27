@@ -133,6 +133,34 @@ token_t isATTR(FILE *tape)
 	return 0;
 }
 
+token_t isRELOP(FILE *tape)
+{
+	token_t t1, t2;
+	int i = 0;
+	if((t1 = getc(tape)) == '<' || t1 == '>') {
+    lexeme[i++] = t1;	
+    if((t2 = getc(tape)) == '=' || t2 == '>') {
+      lexeme[i++] = t2;		
+      lexeme[i] = 0;
+      if(t2 == '>')
+        return NEQ;
+      if(t1 == '<')
+        return LEQ;
+      else
+        return GEQ;
+    }
+    ungetc(t2, tape);
+    if(t1 == '<')
+        return LSR;
+      else
+        return GRT;
+	} else if (t1 == '=') {
+    return EQ;
+  }
+	ungetc(t1, tape);
+	return 0;
+}
+
 // função que lê os caracteres da fita e tenta transformar em um símbolo da
 // gramática, para cada uma das funções acima (possíveis 'tokens')
 // caso nenhuma delas seja satisfeita apenas retorna o último caractere lido.
@@ -152,6 +180,8 @@ token_t gettoken(FILE *tape)
   if (token = isSTRING(tape)) goto END_TOKEN;
   
   if (token = isATTR(tape)) goto END_TOKEN;
+  
+  if (token = isRELOP(tape)) goto END_TOKEN;
 
 	token = getc(tape);
 	lexeme[0] = token;

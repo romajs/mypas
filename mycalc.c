@@ -25,23 +25,23 @@ isaddop(const token_t token)
       return 1;
     default:
       return 0;
-   }
+  }
 }
 
 // relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
 isrelop(const token_t token)
 {
   switch(token) {
-    case '>':
-    case GEQ:
-    case '<':
-    case LEQ:
-    case '=':
+    case EQ:
     case NEQ:
+    case GRT:
+    case GEQ:
+    case LSR:
+    case LEQ:
       return 1;
     default:
       return 0;
-   }
+  }
 }
 
 // função que calcula o resultado entre duas variávies dado seu operador
@@ -52,6 +52,16 @@ double calc(double x, double y, int op) {
 		case '-': result = x - y; break;
 		case '*': result = x * y; break;
 		case '/': result = x / y; break;
+    case DIV: result = (int)(x / y); break;
+    case MOD: result = (int)x % (int)y; break;
+    case AND: result = x && y; break;    
+    case OR:  result = x || y; break;
+    case EQ:  result = x == y; break;
+    case NEQ: result = x != y; break;
+    case GRT: result = x > y; break;
+    case GEQ: result = x >= y; break;
+    case LSR: result = x < y; break;
+    case LEQ: result = x <= y; break;
 	}
 	debug( "(calc) %.2f %c %.2f = %.2f\n", x, op, y, result);
 	return result;
@@ -124,7 +134,7 @@ double expr(void)
   debug("expr\n");
 	memset(&oper[0], 0, sizeof(oper));
 	memset(&operand[0], 0, sizeof(operand));	
-	E_lvl = -1, T_lvl = -1, F_lvl = -1;
+	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
 	sp = -1, opsp = -1;
 
 	E: debug( "E: %d\n", ++E_lvl);
@@ -138,6 +148,8 @@ double expr(void)
 		push_oper('-');
 		can_oper = 1; // deve fazer esta operação o quanto antes (imediato)    
 	}
+  
+  R: debug( "R: %d\n", ++R_lvl);
 
 	T: debug( "T: %d\n", ++T_lvl);
 
@@ -171,7 +183,7 @@ double expr(void)
 
 	exec_oper(); // executa as operações mais 'voláteis' ('*' & '/')	 
 
-	if(lookahead == '*' || lookahead == '/') {
+	if(ismulop(lookahead)) {
 		push_oper(lookahead);
 		match(lookahead);
 		can_oper = 1;
@@ -183,10 +195,20 @@ double expr(void)
 	// operações de '+' ou '-' são 'agendadas'
 	// Não precisa atribuir 'can_oper = 0;' pois já é feito automaticamente em exe_oper() 
 
-	if(lookahead == '+' || lookahead == '-') {
+	if(isaddop(lookahead)) {
 		push_oper(lookahead);
 		match(lookahead);
 		goto T;
+	}
+  
+  _R: debug( "_R: %d\n", --R_lvl);  
+  
+  // TODO: A implementação de 'oper' terá de ser modificada
+  
+	if(isrelop(lookahead)) {
+		push_oper(lookahead);
+		match(lookahead);
+		goto R;
 	}
 
 	// se chegou até É porque OU é fim de arquivo OU é ')', então:

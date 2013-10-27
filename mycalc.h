@@ -10,7 +10,7 @@
 #define PARSER_H
 
 // contadores de recursão
-int E_lvl, T_lvl, F_lvl, A_lvl;				
+int E_lvl, R_lvl, T_lvl, F_lvl;				
 
 // pilha de operandos (constantes numéricas apenas)	
 double operand[MAX_STACK_SIZE]; 								
