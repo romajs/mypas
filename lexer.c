@@ -43,8 +43,12 @@ token_t isID(FILE *tape)
 	if (isalpha(head = getc(tape))) {
 		int i = 0;
 		lexeme[i++] = toupper(head);
-		while (isalnum(head = getc(tape)) && i + 1 < MAX_ID_SIZE) {
-      lexeme[i++] = toupper(head);
+		while (isalnum(head = getc(tape))) {
+      if(i + 1 < MAX_ID_SIZE) {
+        lexeme[i++] = toupper(head);
+      } else {
+        err(FATAL, LEXICAL, "Max Integer Digits Overflow\n");
+      }
 		}
 		lexeme[i] = 0;
 		ungetc(head, tape);
@@ -66,8 +70,11 @@ token_t isNUM(FILE *tape)
 		int i = 0;
 		lexeme[i++] = head;
 		while(isdigit(head = getc(tape))){
-			if(i + 1 < MAX_INT_DIG)
+			if(i + 1 < MAX_INT_DIG) {
 				lexeme[i++] = head;		
+      } else {
+        err(FATAL, LEXICAL, "Max Integer Digits Overflow\n");
+      }
 		}
 		if(head == '.') {
 			lexeme[i++] = '.';
@@ -75,7 +82,7 @@ token_t isNUM(FILE *tape)
 				if(i + 1 < MAX_PRC_DIG) {
 					lexeme[i++] = head;
 				} else {
-					//exit_with_error(MAX_DIG_OVERFLOW);
+					err(FATAL, LEXICAL, "Max Precision Digits Overflow\n");
 				}
 				// TODO: terminar PONTO FLUTUANTE
 			}
@@ -83,6 +90,42 @@ token_t isNUM(FILE *tape)
 		lexeme[i] = 0;
 		ungetc(head,tape);
 		return NUM;
+	}
+	ungetc(head, tape);
+	return 0;
+}
+
+token_t isSTRING(FILE *tape)
+{
+	token_t head;
+
+	if((head = getc(tape)) == "\"") {
+		int i = 0;
+		while((head = getc(tape)) == "\""){
+			if(i + 1 < MAX_STR_LEN) {
+				lexeme[i++] = head;		
+      }
+		}
+    lexeme[i] = 0;
+    ungetc(head, tape);
+    return STRING;
+	}
+	ungetc(head, tape);
+	return 0;
+}
+
+token_t isATTR(FILE *tape)
+{
+	token_t head;
+
+	if((head = getc(tape)) == ":") {
+		int i = 0;
+    lexeme[i++] = head;	
+    if((head = getc(tape)) == "=") {
+      lexeme[i++] = head;		
+      lexeme[i] = 0;
+      return ATTR;
+    }
 	}
 	ungetc(head, tape);
 	return 0;
@@ -103,6 +146,10 @@ token_t gettoken(FILE *tape)
 	if (token = isID(tape)) goto END_TOKEN;
 
 	if (token = isNUM(tape)) goto END_TOKEN;
+  
+  if (token = isSTRING(tape)) goto END_TOKEN;
+  
+  if (token = isATTR(tape)) goto END_TOKEN;
 
 	token = getc(tape);
 	lexeme[0] = token;
