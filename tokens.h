@@ -4,7 +4,8 @@
 enum {
 	ID = 1025,
 	NUM,
-	UINT
+	UINT,
+  STR,
 };
 
 enum errors {
