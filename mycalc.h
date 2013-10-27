@@ -22,53 +22,46 @@ int opsp;
 // flag de permissão para execução de operações
 int can_oper;														
 
-// tabela de símbolos, armazenamento dos "lexemas" das variávies
-char SYMTAB[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE]; 		
-// pilha de valores referente a tabela de símbolos
-double acc[MAX_SYMTAB_ENTRIES]; 				
-int nextentry;
-
-int attr[MAX_STACK_SIZE];
-int asp;
-
 #endif // PARSER_H
-
-void exec_attr(void);
 
 /*
  * LL(1) expression grammar
  *
  * EBNF:
  *
- * expr -> [-] term { [+|-] term }
  *
+ * expr -> {attr} [-] term { [+|-] term }
  *
+ *                         --(+|-)--
+ *            -(-)-        |       |
+ *            |   |        |       |
+ *            |   v        v       |
+ * (E)------------------->(T)--------->(_E)
  *
- *                    --(+|-)---
- *        --(-)--     |        |
- *        |     |     |        |
- *        |     v     v        |
- * (expr)---------->(term)--->(?)-->(@)
- *
- */
-double expr(void);
-/*
+ * 
  * term -> fact { [*|/] fact }
  *
- *             -------(*|/)-------
- *             |                 |
- *             v                 |
- * (term)--->(init)--->(fact)---(?)-->(end)
+ *             --(*|/)--
+ *             |       |
+ *             v       |
+ * (T)------->(F)--------->(_T)
+ * 
+ * 
+ * fact -> ID ['=' expr] | NUM | '('expr')'
  *
+ * (F)---------------> (ID) --------------\
+ *  | \                                    \
+ *  |  \------------> (NUM) ------------->(_F)
+ *  |                                      /
+ *   \-----> '(' ----> (E) ----> ')' -----/
+ * 
  */
-void term(void);
-/*
- * fact -> ID
- *       | NUM
- *       | ( expr )
- *
- */
-void fact(void);
+ 
+double expr(void);
+
+extern token_t lookahead;
+
+extern char lexeme[];
 
 extern void match(token_t);
 
@@ -79,7 +72,3 @@ extern FILE *object;
 extern void debug(const char *, ...);
 
 extern void debug_oper(int [MAX_RECURSION_SIZE][MAX_STACK_SIZE], int , int );
-
-extern token_t lookahead;
-
-extern char lexeme[];
