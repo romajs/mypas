@@ -23,11 +23,11 @@ q0:
 	ungetc(head, tape);
 }
 
-// fim de arquivo (EOF) ou ENTER ('\n')
+// fim de arquivo (EOF)
 token_t isEOF(FILE *tape)
 {
 	token_t head;
-	if((head = getc(tape)) == '\n' || head == EOF) {
+	if((head = getc(tape)) == EOF) {
 		lexeme[0] = 0;
 		return EOF;
 	}
@@ -109,9 +109,8 @@ token_t gettoken(FILE *tape)
 	lexeme[1] = 0;  
 
 END_TOKEN:  
-	debug("lookahead: \"%c\", ", token);
-  debug("lexeme: \"%s\", ", lexeme); 
-  debug("%d!\n", token);
+	debug("lookahead: %d, ", token);
+  debug("lexeme: \"%s\"\n", lexeme); 
 	return token;
 }
 /**************************************************************************
@@ -133,7 +132,7 @@ void match(token_t predicted) {
      }
   } else {
     debug("FAILED!\n");
-    //exit_with_error(TOKEN_MISMATCH);
+    err(FATAL, LEXICAL, "Token mismatch.\n");
   }
 }
 

@@ -16,3 +16,5 @@ extern token_t lookahead;
 extern char lexeme[];
 
 extern keyword iskeyword(char const *);
+
+extern void err(int, int, const char *, ...);
