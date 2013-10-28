@@ -95,6 +95,42 @@ token_t isNUM(FILE *tape)
 	return 0;
 }
 
+token_t isTRUE(FILE *tape)
+{
+	token_t head;
+	int i = 0;
+	const char* s = "TRUE";
+	while(i < sizeof(s)) {
+		head = getc(tape);
+		lexeme[i++] = head;
+		if(toupper(head) != s[i]) {
+			while(i > 0)
+				ungetc(lexeme[--i], tape);
+			return 0;
+		}
+	}
+	lexeme[i] = 0;
+	return TRUE;
+}
+
+token_t isFALSE(FILE *tape)
+{
+	token_t head;
+	int i = 0;
+	const char* s = "FALSE";
+	while(i < sizeof(s)) {
+		head = getc(tape);
+		lexeme[i++] = head;
+		if(toupper(head) != s[i]) {
+			while(i > 0)
+				ungetc(lexeme[--i], tape);
+			return 0;
+		}
+	}
+	lexeme[i] = 0;
+	return FALSE;
+}
+
 token_t isSTRING(FILE *tape)
 {
 	token_t head;
@@ -137,11 +173,13 @@ token_t isRELOP(FILE *tape)
 {
 	token_t t1, t2;
 	int i = 0;
-	if((t1 = getc(tape)) == '<' || t1 == '>') {
+	if((t1 = getc(tape)) == '<' || t1 == '>' || t1 == '=') {
     lexeme[i++] = t1;	
     if((t2 = getc(tape)) == '=' || t2 == '>') {
       lexeme[i++] = t2;		
       lexeme[i] = 0;
+			if (t1 == '=')
+				return EQ;
       if(t2 == '>')
         return NEQ;
       if(t1 == '<')
@@ -154,9 +192,7 @@ token_t isRELOP(FILE *tape)
         return LSR;
       else
         return GRT;
-	} else if (t1 == '=') {
-    return EQ;
-  }
+	}
 	ungetc(t1, tape);
 	return 0;
 }
@@ -178,6 +214,10 @@ token_t gettoken(FILE *tape)
 	if (token = isNUM(tape)) goto END_TOKEN;
   
   if (token = isSTRING(tape)) goto END_TOKEN;
+	
+	if (token = isTRUE(tape)) goto END_TOKEN;
+	
+	if (token = isFALSE(tape)) goto END_TOKEN;
   
   if (token = isATTR(tape)) goto END_TOKEN;
   

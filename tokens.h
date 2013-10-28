@@ -6,6 +6,8 @@ enum {
 	NUM,
 	UINT,
   STR,
+  TRUE,
+  FALSE,
 };
 
 enum errors {
