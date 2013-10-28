@@ -19,7 +19,7 @@ END;
 FUNCTION Fibonacci(x: Integer): Boolean;
 BEGIN
   if (x = 0 or x = 1) then
-    result := x;
+    result := x
   else
     result := Fibonnaci(x - 2) + Fibonacci(x - 1);
 END;

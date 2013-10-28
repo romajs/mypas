@@ -2,7 +2,8 @@
 #define KEYWORD_H
 
 #define FOREACH_ENUM(ENUM) \
-	ENUM(BEGIN = 0x10000) \
+	ENUM(_ = 0x10000) \
+	ENUM(BEGIN) \
 	ENUM(PROGRAM) \
 	ENUM(VAR) \
 	ENUM(ATTR) \
