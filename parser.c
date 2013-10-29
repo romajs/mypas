@@ -80,6 +80,62 @@ sb0:
 	match(';');
 }
 /*
+ * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
+ */
+void sbrhead(void)
+{
+  debug("sbrhead\n");
+	if(lookahead == PROCEDURE) {
+		match(PROCEDURE);
+		match(ID);
+		argdef();
+	} else {
+		match(FUNCTION);
+		match(ID);
+		argdef();
+		match(':');
+		smptype();
+	}
+	match(';');
+}
+/*
+ * argdef -> [ '(' arglist ')' ]
+ */
+void argdef(void)
+{
+  debug("argdef\n");
+	if(lookahead == '(') {
+		match('(');
+		arglist();
+		match(')');
+	}
+}
+/*
+ * arglist -> argspc { ';' argspc }
+ */
+void arglist(void)
+{
+  debug("arglist\n");
+al0:
+	argspc();
+	if(lookahead == ';') {
+		match(';');
+		goto al0;
+	}
+}
+/*
+ * argspc -> [ VAR ] idlist ':' smptype
+ */
+void argspc(void)
+{
+  debug("argspc\n");
+	if(lookahead == VAR)
+		match(VAR);
+	idlist();
+	match(':');
+	smptype();
+}
+/*
  * idlist -> ID { ',' ID }
  */
 char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
@@ -141,65 +197,32 @@ int smptype(void)
 			return -1;
 	}
 }
+/******************************************************************************
+ *** Imperative scope is defined hereafter: ***********************************
+ *****************************************************************************/
 /*
- * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
+ * stmblk -> BEGIN stmtlst END
  */
-void sbrhead(void)
+void stmblk(void)
 {
-  debug("sbrhead\n");
-	if(lookahead == PROCEDURE) {
-		match(PROCEDURE);
-		match(ID);
-		argdef();
-	} else {
-		match(FUNCTION);
-		match(ID);
-		argdef();
-		match(':');
-		smptype();
-	}
-	match(';');
+  debug("stmblk\n");
+	match(BEGIN);
+	stmtlst();
+	match(END);
 }
 /*
- * argdef -> [ '(' arglist ')' ]
+ * stmtlst -> stmt { ';' stmt }
  */
-void argdef(void)
+void stmtlst(void)
 {
-  debug("argdef\n");
-	if(lookahead == '(') {
-		match('(');
-		arglist();
-		match(')');
-	}
-}
-/*
- * arglist -> argspc { ';' argspc }
- */
-void arglist(void)
-{
-  debug("arglist\n");
-al0:
-	argspc();
+  debug("stmlst\n");
+s0:
+	stmt();
 	if(lookahead == ';') {
 		match(';');
-		goto al0;
+		goto s0;
 	}
 }
-/*
- * argspc -> [ VAR ] idlist ':' smptype
- */
-void argspc(void)
-{
-  debug("argspc\n");
-	if(lookahead == VAR)
-		match(VAR);
-	idlist();
-	match(':');
-	smptype();
-}
-/******************************************************************************
- **** Imperative scope is defined hereafter:
- *****************************************************************************/
 /*
  * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
  */
@@ -229,31 +252,8 @@ void stmt(void)
 			;
 	}
 }
-/*
- * stmblk -> BEGIN stmtlst END
- */
-void stmblk(void)
-{
-  debug("stmblk\n");
-	match(BEGIN);
-	stmtlst();
-	match(END);
-}
-/*
- * stmtlst -> stmt { ';' stmt }
- */
-void stmtlst(void)
-{
-  debug("stmlst\n");
-s0:
-	stmt();
-	if(lookahead == ';') {
-		match(';');
-		goto s0;
-	}
-}
-/* ifstmt -> IF expr THEN stmt [ ELSE stmt ]
- *
+/* 
+ * ifstmt -> IF expr THEN stmt [ ELSE stmt ]
  */
 void ifstmt(void)
 {
@@ -267,21 +267,6 @@ void ifstmt(void)
 		stmt();
 	}
 }
-/*
- * expr -> E [ relop E ]
- *
- * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
- *
- * E -> [ '-' | NOT ] term { addop term }
- *
- * addop -> '+' | '-' | OR
- *
- * term -> fact { mulop fact }
- *
- * mulop -> '*' | '/' | DIV | MOD | AND
- */
-// IMPLEMENTED in MYCALC.C
-
 /*
  * whlstmt -> WHILE expr DO stmt
  */
@@ -329,7 +314,7 @@ void repstmt(void)
 	expr();
 } 
 /*
- * idstmt -> ID [ parm | [ '[' expr ']' ] ':=' expr ]
+ * idstmt -> ID [ param | [ '[' expr ']' ] [ ':=' expr ]
  */
 void idstmt(void)
 {
@@ -370,3 +355,22 @@ e0:
 		goto e0;
 	}
 }
+/******************************************************************************
+ *** Algebric and Boolean Expressions are defined hereafter: ******************
+ *****************************************************************************/
+/*
+ * expr -> E [ relop E ]
+ *
+ * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+ *
+ * E -> [ '-' | NOT ] term { addop term }
+ *
+ * addop -> '+' | '-' | OR
+ *
+ * term -> fact { mulop fact }
+ *
+ * mulop -> '*' | '/' | DIV | MOD | AND
+ *
+ * fact -> ID [ param | [ '[' expr ']' ] [ ':=' expr ]
+ */
+// Implementation in file 'mycalc.c'
