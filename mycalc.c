@@ -158,6 +158,15 @@ double expr(void)
 	switch(lookahead) {
     case ID:
       match(ID);
+		if(lookahead == '(') {
+			param();
+		} else {
+			if(lookahead == '[') {
+				match('[');
+				expr();
+				match(']');
+			}
+		}
       /*if(recall(lexeme) > -1) {
         push_operand(getvalue(lexeme)); // deve empilhar o valor da variável de SYMTAB
       } else {
