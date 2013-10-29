@@ -21,10 +21,10 @@ void mypas(void)
 	match(ID);
 	match(';');
 	/* semantic action */ scope = GLOBAL;/**/
-m0:
+q0:
 	if(lookahead != BEGIN) {
 		specification();
-		goto m0;
+		goto q0;
 	}
 	stmblk();
 	match('.');
@@ -38,28 +38,28 @@ m0:
 void specification(void)
 {	
   debug("specification\n");
-	/* semantic action */ scope = LOCAL;
-	//int symtab_first_entry = symtab_next_entry;/**/
 	if(lookahead == VAR ) {
 		vardeclr();
 	} else {
 		sbrdeclr();
 	}	
-	/* semantic action */ scope = GLOBAL;
-	//symtab_next_entry = symtab_first_entry;/**/
 }
 /*
- * vardeclr ->  VAR idlist ':' typespec ';'
+ * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
  */
 void vardeclr(void)
 {
   debug("vardeclr\n");
 	/* semantic action */int type;/**/
 	match(VAR);
-	idlist(); /* -> variable-name list*/
-	match(':');
-	type = typespec();/* ->simple-type attribute*/
-	match(';');
+q0:
+	if(lookahead == ID) {
+		idlist(); /* -> variable-name list*/
+		match(':');
+		type = typespec();/* ->simple-type attribute*/
+		match(';');
+		goto q0;
+	}
 	/* semantic rule: register the variable list with the ame type
 	 * in the symbol table
 	 *///symtab_add_list(id_count, id_list, type, scope);/**/
@@ -71,13 +71,17 @@ void sbrdeclr(void)
 {
   debug("sbrdeclr\n");
 	sbrhead();
-sb0:
+	/* semantic action */ scope = LOCAL;
+	//int symtab_first_entry = symtab_next_entry;/**/
+q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
-		goto sb0;
+		goto q0;
 	}
 	stmblk();
 	match(';');
+	/* semantic action */ scope = GLOBAL;
+	//symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
@@ -116,11 +120,11 @@ void argdef(void)
 void arglist(void)
 {
   debug("arglist\n");
-al0:
+q0:
 	argspc();
 	if(lookahead == ';') {
 		match(';');
-		goto al0;
+		goto q0;
 	}
 }
 /*
@@ -144,12 +148,12 @@ void idlist(void)
 {
   debug("idlist\n");
 	/* semantic action */ id_count = 0; /**/
-il0:
+q0:
 	/* semantic action */ strcpy(id_list[id_count++], lexeme); /**/
 	match(ID);
 	if(lookahead == ',') {
 		match(',');	
-		goto il0;
+		goto q0;
 	}
 }	
 /*
@@ -158,14 +162,14 @@ il0:
 typespec(void)
 {
   debug("typespec\n");
-ts0:
+q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
 		match(UINT); // ???
 		match(']');
 		match(OF);
-		goto ts0;
+		goto q0;
 	}
 	else {
 		return smptype();
@@ -216,11 +220,11 @@ void stmblk(void)
 void stmtlst(void)
 {
   debug("stmlst\n");
-s0:
+q0:
 	stmt();
 	if(lookahead == ';') {
 		match(';');
-		goto s0;
+		goto q0;
 	}
 }
 /*
@@ -348,11 +352,11 @@ void param(void)
 void exprlst(void)
 {
   debug("exprlst\n");
-e0:
+q0:
 	expr();
 	if(lookahead == ',') {
 		match(',');
-		goto e0;
+		goto q0;
 	}
 }
 /******************************************************************************
