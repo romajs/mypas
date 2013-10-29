@@ -1,14 +1,11 @@
 PROGRAM test101;
 VAR
   id: Integer;
-VAR
   produto: String;
-VAR
   valor, custo: Real;
-VAR
   qtde: Double;
-VAR
   ativo: Boolean;
+{ Função que imprime "Hello" na saída }
 PROCEDURE SayHello;
 var
   msg: String;
@@ -16,12 +13,26 @@ BEGIN
   msg := 'Hello';
   Writeln(msg);
 END;
-FUNCTION Fibonacci(x: Integer): Boolean;
+{ Função de Fibonacci }
+FUNCTION Fibonacci(x: Integer): Integer;
 BEGIN
-  if (x = 0 or x = 1) then
+  IF (x = 0) or (x = 1) THEN
     result := x
-  else
-    result := Fibonnaci(x - 2) + Fibonacci(x - 1);
+  ELSE
+    result := Fibonacci(x - 2) + Fibonacci(x - 1);
 END;
+{ Função de Fatorial }
+FUNCTION Fatorial(i: Integer): Integer;
+VAR
+	x: Integer;
+BEGIN
+	x := 1;
+	WHILE(i > 0) DO
+	BEGIN
+		x := x * i;
+		i := i - 1;
+	END;	
+	result := x;
+END;	
 BEGIN
 END.
