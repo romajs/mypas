@@ -53,22 +53,22 @@ precedence(const token_t token)
     case '/':
     case DIV:
     case MOD:
-		return 3;
+			return 3;
     case '+':
     case '-':
-		return 4;
+			return 4;
     case GRT:
     case GEQ:
     case LSR:
     case LEQ:
-		return 6;
-	 case EQ:
+			return 6;
+		case EQ:
     case NEQ:
-		return 7;
+			return 7;
     case AND:
-		return 11;
+			return 11;
     case OR:
-		return 12;
+			return 12;
   }
 }
 
@@ -123,7 +123,7 @@ double getvalue(char const *variable) {
 // função que empilha um 'operando' na pilha de operandos
 void push_operand(double value) {
 	operand[++sp] = value;
-	debug( "(push) operand[%d] = %.2f\n", sp, operand[sp]);	
+	debug( "(push) operand[%d]: value = %.2f\n", sp, operand[sp]);	
 }
 
 // função que empilha um 'operador' na pilha de operadores
@@ -131,26 +131,31 @@ void push_oper(token_t token) {
 	++opsp;
 	oper[opsp].symbol = token;
 	oper[opsp].level = E_lvl;
-	//debug( "(push) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[E_lvl][opsp]);	
+	debug( "(push) oper[%d]: symbol = \"%c\", level = %d\n", opsp, token, E_lvl);	
 	//debug_oper(oper, E_lvl, opsp);
 }
 
 // função que verifica se deveria operar no momento
-should_oper(void) {
+can_oper(void) {
 	// pode operar desde que:
-	return oper[opsp].level == oper[opsp - 1].level &&
-				precedence(oper[opsp].symbol) <= precedence(lookahead);
+	// 1 - caso os operadores estejam no mesmo nível de recursão
+	//     1.1 - então verifica as precedências dos operadores
+	// 2 - tenha saído de um nível de recursão
+	return (oper[opsp].level == oper[opsp - 1].level &&
+				precedence(oper[opsp].symbol) <= precedence(lookahead)) ||
+				oper[opsp].level > E_lvl;
 }
 
 // função que executa as operações da pilha (desde que possa operar)
 void exec_oper(void) {
 	// deve operar quando:
 	if(opsp > - 1) { // se puder operar
-		do {			
-			debug( "(pop) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[opsp].symbol);	
+		while(can_oper()) { // enquanto puder operar			
+			debug("(pop) oper[%d]: symbol = \"%c\", level = %d\n", opsp, oper[opsp].symbol, oper[opsp].level);	
+			debug("(pop) operand[%d] = %.2f\n", sp, operand[sp]);
+			debug("(pop) operand[%d] = %.2f\n", sp-1, operand[sp-1]);	
 			operand[--sp] = calc(operand[sp], operand[sp+1], oper[opsp--].symbol);
-			debug( "(pop) operand[%d] = %.2f\n", sp, operand[sp]);	
-		} while(can_oper = should_oper()); // enquanto puder operar
+		} 
 	} 
 	//debug_oper(oper, E_lvl, opsp);
 }
@@ -165,14 +170,11 @@ double expr(void)
 
 	E: debug( "E: %d\n", ++E_lvl);
 
-	can_oper = 0;
-
 	if(lookahead == '-') { // inversão de sinal
 		match('-');
 		debug( "(signal reversion) activated.\n");
 		push_operand(0);
 		push_oper('-');
-		can_oper = 1; // deve fazer esta operação o quanto antes (imediato)    
 	}
 
 	T: debug( "T: %d\n", ++T_lvl);	
@@ -231,25 +233,18 @@ double expr(void)
 	if(ismulop(lookahead)) {
 		push_oper(lookahead);
 		match(lookahead);
-		can_oper = 1;
 		goto F;
 	}
 
 	_T: debug( "_T: %d\n", --T_lvl);
 
-	// operações de '+' ou '-' são 'agendadas'
-	// Não precisa atribuir 'can_oper = 0;' pois já é feito automaticamente em exe_oper() 
+	exec_oper(); 
 
 	if(isaddop(lookahead)) {
 		push_oper(lookahead);
 		match(lookahead);
 		goto T;
 	}
-
-	// se chegou até É porque OU é fim de arquivo OU é ')', então:
-	// 1 - deve operar o restante da pilha
-	can_oper = 1;
-	exec_oper();  
 
 	_E: debug( "_E: %d\n", --E_lvl);
 

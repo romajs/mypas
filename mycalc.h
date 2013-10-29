@@ -16,7 +16,6 @@ int E_lvl, R_lvl, T_lvl, F_lvl;
 double operand[MAX_STACK_SIZE]; 								
 int sp;
 
-
 struct _oper_ {
 	token_t symbol; // símbolo
 	int level; // nível de recursão (em E_lvl)
@@ -26,11 +25,7 @@ typedef struct _oper_ Oper;
 
 // pilha de operadores
 Oper oper[MAX_STACK_SIZE];
-
-int opsp;
-
-// flag de permissão para execução de operações
-int can_oper;														
+int opsp;											
 
 #endif // PARSER_H
 
