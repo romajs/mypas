@@ -16,9 +16,17 @@ int E_lvl, R_lvl, T_lvl, F_lvl;
 double operand[MAX_STACK_SIZE]; 								
 int sp;
 
-// matriz de operadores (pilha de pilhas)
-// pilha de nível de recursão com subpilhas de operadores
-int oper[MAX_RECURSION_SIZE][MAX_STACK_SIZE];
+
+struct _oper_ {
+	token_t symbol; // símbolo
+	int level; // nível de recursão (em E_lvl)
+};
+
+typedef struct _oper_ Oper;
+
+// pilha de operadores
+Oper oper[MAX_STACK_SIZE];
+
 int opsp;
 
 // flag de permissão para execução de operações
@@ -32,7 +40,7 @@ int can_oper;
  * EBNF:
  *
  *
- * expr -> {attr} [-] term { [+|-] term }
+ * expr -> [-] term { [+|-] term }
  *
  *                         --(+|-)--
  *            -(-)-        |       |
@@ -41,12 +49,20 @@ int can_oper;
  * (E)------------------->(T)--------->(_E)
  *
  * 
- * term -> fact { [*|/] fact }
+ * term -> relp { [*|/] relp }
  *
  *             --(*|/)--
  *             |       |
  *             v       |
- * (T)------->(F)--------->(_T)
+ * (T)------->(R)--------->(_T)
+ *
+ *
+ * relp -> fact { [*|/] fact }
+ *
+ *             --(=|<>|>|>=|<|<=)--
+ *             |                  |
+ *             v                  |
+ * (R)------->(F)-------------------->(_R)
  * 
  * 
  * fact -> ID ['=' expr] | NUM | '('expr')'
@@ -58,6 +74,7 @@ int can_oper;
  *   \-----> '(' ----> (E) ----> ')' -----/
  * 
  */
+double expr(void);
 
 // mulop -> '*' | '/' | DIV | MOD | AND 
 int ismulop(const token_t);
@@ -67,8 +84,10 @@ int isaddop(const token_t);
 
 // relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
 int isrelop(const token_t);
- 
-double expr(void);
+
+/*
+ * Extern declarations
+ */
 
 extern token_t lookahead;
 

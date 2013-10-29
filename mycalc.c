@@ -44,6 +44,34 @@ isrelop(const token_t token)
   }
 }
 
+// http://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
+// quanto maior -> menos significativo
+precedence(const token_t token)
+{
+	switch(token) {
+    case '*':
+    case '/':
+    case DIV:
+    case MOD:
+		return 3;
+    case '+':
+    case '-':
+		return 4;
+    case GRT:
+    case GEQ:
+    case LSR:
+    case LEQ:
+		return 6;
+	 case EQ:
+    case NEQ:
+		return 7;
+    case AND:
+		return 11;
+    case OR:
+		return 12;
+  }
+}
+
 // função que calcula o resultado entre duas variávies dado seu operador
 double calc(double x, double y, int op) { 
   double result = 0.00;
@@ -100,33 +128,31 @@ void push_operand(double value) {
 
 // função que empilha um 'operador' na pilha de operadores
 void push_oper(token_t token) {
-	oper[E_lvl][++opsp] = token;
-	debug( "(push) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[E_lvl][opsp]);	
-	debug_oper(oper, E_lvl, opsp);
+	++opsp;
+	oper[opsp].symbol = token;
+	oper[opsp].level = E_lvl;
+	//debug( "(push) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[E_lvl][opsp]);	
+	//debug_oper(oper, E_lvl, opsp);
 }
 
-// função que verifica se é possível operar no momento
+// função que verifica se deveria operar no momento
 should_oper(void) {
 	// pode operar desde que:
-	//	1 - enquanto houverem operadoes;
-	//	2 - enquanto o próximo operador não for '*' ou '/' (mulop);
-	return oper[E_lvl][opsp] && !(lookahead == '*' || lookahead == '/');
+	return oper[opsp].level == oper[opsp - 1].level &&
+				precedence(oper[opsp].symbol) <= precedence(lookahead);
 }
 
 // função que executa as operações da pilha (desde que possa operar)
 void exec_oper(void) {
 	// deve operar quando:
-	// 1 - houver ao menos 1 operador, opsp = 0
-	// 2 - houver mais que 1 operando, sp = 1 , para poder calcular (sp0 + sp1)
-	// 3 - can_oper for verdadeiro (mulop | EOF | ')'
-	if(opsp > - 1 && sp > -1 && oper[E_lvl][opsp] && can_oper) { // se puder operar
+	if(opsp > - 1) { // se puder operar
 		do {			
-			debug( "(pop) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[E_lvl][opsp]);	
-			operand[--sp] = calc(operand[sp], operand[sp+1], oper[E_lvl][opsp--]);
+			debug( "(pop) oper[%d][%d] = \"%c\"\n", E_lvl, opsp, oper[opsp].symbol);	
+			operand[--sp] = calc(operand[sp], operand[sp+1], oper[opsp--].symbol);
 			debug( "(pop) operand[%d] = %.2f\n", sp, operand[sp]);	
 		} while(can_oper = should_oper()); // enquanto puder operar
 	} 
-	debug_oper(oper, E_lvl, opsp);
+	//debug_oper(oper, E_lvl, opsp);
 }
 
 double expr(void)
@@ -148,12 +174,12 @@ double expr(void)
 		push_oper('-');
 		can_oper = 1; // deve fazer esta operação o quanto antes (imediato)    
 	}
+
+	T: debug( "T: %d\n", ++T_lvl);	
   
   R: debug( "R: %d\n", ++R_lvl);
 
-	T: debug( "T: %d\n", ++T_lvl);
-
-	F: debug( "F: %d\n", ++F_lvl);  
+	F: debug( "F: %d\n", ++F_lvl); 	
 
 	switch(lookahead) {
     case ID:
@@ -187,10 +213,20 @@ double expr(void)
       // se não for nenhum dos esperados acima, então não faz parte da gramática
       err(FATAL, LEXICAL, "Token mismatch\n");
 	}	
-
+ 
 	_F: debug( "_F: %d\n", --F_lvl);
-
-	exec_oper(); // executa as operações mais 'voláteis' ('*' & '/')	 
+	
+		exec_oper();  
+  
+	if(isrelop(lookahead)) {
+		push_oper(lookahead);
+		match(lookahead);
+		goto R;
+	}
+ 
+  _R: debug( "_R: %d\n", --R_lvl);
+  
+	exec_oper();  
 
 	if(ismulop(lookahead)) {
 		push_oper(lookahead);
@@ -208,16 +244,6 @@ double expr(void)
 		push_oper(lookahead);
 		match(lookahead);
 		goto T;
-	}
-  
-  _R: debug( "_R: %d\n", --R_lvl);  
-  
-  // TODO: A implementação de 'oper' terá de ser modificada
-  
-	if(isrelop(lookahead)) {
-		push_oper(lookahead);
-		match(lookahead);
-		goto R;
 	}
 
 	// se chegou até É porque OU é fim de arquivo OU é ')', então:
