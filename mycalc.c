@@ -218,7 +218,7 @@ double expr(void)
  
 	_F: debug( "_F: %d\n", --F_lvl);
 	
-		exec_oper();  
+	//exec_oper();  
   
 	if(isrelop(lookahead)) {
 		push_oper(lookahead);
@@ -228,7 +228,7 @@ double expr(void)
  
   _R: debug( "_R: %d\n", --R_lvl);
   
-	exec_oper();  
+	//exec_oper();  
 
 	if(ismulop(lookahead)) {
 		push_oper(lookahead);
@@ -238,7 +238,7 @@ double expr(void)
 
 	_T: debug( "_T: %d\n", --T_lvl);
 
-	exec_oper(); 
+	//exec_oper(); 
 
 	if(isaddop(lookahead)) {
 		push_oper(lookahead);
