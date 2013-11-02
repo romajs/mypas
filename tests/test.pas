@@ -34,5 +34,22 @@ BEGIN
 	END;	
 	result := x;
 END;	
+{ Loop infinito }
+PROCEDURE Infinito;
+BEGIN
+  REPEAT
+    { to the infinty and beyond... }
+    ;
+  UNTIL true
+END;
+{ Imprime elementos de um Array }
+PROCEDURE ImprimeArray;
+VAR
+  arr: ARRAY[10] OF Integer;
+  i: Integer;
+BEGIN
+  FOR i := 0 TO 10 DO
+    WriteLn(arr[i]);
+END;
 BEGIN
 END.

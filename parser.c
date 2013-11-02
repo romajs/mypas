@@ -166,7 +166,7 @@ q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
-		match(UINT); // ???
+		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
 		match(']');
 		match(OF);
 		goto q0;

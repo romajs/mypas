@@ -3,11 +3,12 @@
 
 enum {
 	ID = 1025,
-	NUM,
-	UINT,
-  STR,
-  TRUE,
-  FALSE,
+  UINT,
+  INT_CTE,
+  REAL_CTE,
+  DBL_CTE,
+  BOOL_CTE,
+  STR_CTE
 };
 
 enum errors {

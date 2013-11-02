@@ -62,7 +62,7 @@ token_t isID(FILE *tape)
 }
 
 // contantes numéricas: integers ou ponto flutuante (double)
-token_t isNUM(FILE *tape)
+token_t isNUM_CTE(FILE *tape)
 {
 	token_t head;
 
@@ -86,16 +86,20 @@ token_t isNUM(FILE *tape)
 				}
 				// TODO: terminar PONTO FLUTUANTE
 			}
+      // TODO: e quanto a REAL_CTE ???
+      lexeme[i] = 0;
+      ungetc(head,tape);
+      return DBL_CTE;
 		}
 		lexeme[i] = 0;
 		ungetc(head,tape);
-		return NUM;
+		return INT_CTE;
 	}
 	ungetc(head, tape);
 	return 0;
 }
 
-token_t isTRUE(FILE *tape)
+/*token_t isTRUE(FILE *tape)
 {
 	token_t head;
 	int i = 0;
@@ -129,9 +133,9 @@ token_t isFALSE(FILE *tape)
 	}
 	lexeme[i] = 0;
 	return FALSE;
-}
+}*/
 
-token_t isSTRING(FILE *tape)
+token_t isSTR_CTE(FILE *tape)
 {
 	token_t head;
 
@@ -145,7 +149,7 @@ token_t isSTRING(FILE *tape)
 			}
 		}
     lexeme[i] = 0;
-    return STR;
+    return STR_CTE;
 	}
 	ungetc(head, tape);
 	return 0;
@@ -211,13 +215,13 @@ token_t gettoken(FILE *tape)
 
 	if (token = isID(tape)) goto END_TOKEN;
 
-	if (token = isNUM(tape)) goto END_TOKEN;
+	if (token = isNUM_CTE(tape)) goto END_TOKEN;
   
-  if (token = isSTRING(tape)) goto END_TOKEN;
+  if (token = isSTR_CTE(tape)) goto END_TOKEN;
 	
-	if (token = isTRUE(tape)) goto END_TOKEN;
+	//if (token = isTRUE(tape)) goto END_TOKEN;
 	
-	if (token = isFALSE(tape)) goto END_TOKEN;
+	//if (token = isFALSE(tape)) goto END_TOKEN;
   
   if (token = isATTR(tape)) goto END_TOKEN;
   

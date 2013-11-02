@@ -72,6 +72,25 @@ precedence(const token_t token)
   }
 }
 
+type(token_t token)
+{
+  debug("type\n");
+	switch(token) {
+		case INTEGER:
+			return 1;
+		case REAL:
+			return 2;
+		case DOUBLE:
+			return 3;
+		case BOOLEAN:
+			return 4;
+		case STRING:
+			return 5;
+		default:
+			return -1;
+	}
+}
+
 // função que calcula o resultado entre duas variávies dado seu operador
 double calc(double x, double y, int op) { 
   double result = 0.00;
@@ -151,7 +170,8 @@ void exec_oper(void) {
 	// deve operar quando:
 	if(opsp > - 1) { // se puder operar
 		while(can_oper()) { // enquanto puder operar			
-			debug("(pop) oper[%d]: symbol = \"%c\", level = %d\n", opsp, oper[opsp].symbol, oper[opsp].level);	
+			debug("(pop) oper[%d]: symbol = \"%c\", level = %d\n",
+        opsp, oper[opsp].symbol, oper[opsp].level);	
 			debug("(pop) operand[%d] = %.2f\n", sp, operand[sp]);
 			debug("(pop) operand[%d] = %.2f\n", sp-1, operand[sp-1]);	
 			operand[--sp] = calc(operand[sp], operand[sp+1], oper[opsp--].symbol);
@@ -195,24 +215,42 @@ double expr(void)
 				match(']');
 			}
 		}
-      /*if(recall(lexeme) > -1) {
-        push_operand(getvalue(lexeme)); // deve empilhar o valor da variável de SYMTAB
-      } else {
-        err(FATAL, SYNTATIC, "Id not declared\n"); // caso contrário, a 'ID' não foi declarada
+      /*if(recall(lexeme) > -1) { 
+        // deve empilhar o valor da variável de SYMTAB
+        push_operand(getvalue(lexeme)); 
+      } else { // caso contrário, a 'ID' não foi declarada
+        err(FATAL, SYNTATIC, "Id not declared\n"); 
       }*/
       break;
-    case NUM: // INT | REAL | DOUBLE
-      push_operand(atof(lexeme)); // empilha o valor da constante
-      match(NUM);
+    /**************************************************************************
+     *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING *
+     *************************************************************************/
+    case TRUE: 
+      //push_operand(1.00);
+      match(TRUE);
       break;
-    case STR:
-      match(STR);
+    case FALSE:
+      //push_operand(0.00);
+      match(FALSE);
       break;
+    case INT_CTE:
+    case REAL_CTE:
+    case DBL_CTE:
+      //push_operand(atof(lexeme)); // empilha o valor da constante
+      match(lookahead);
+      break;
+    case STR_CTE:
+      // TODO: push_operand(???);
+      match(STR_CTE);
+      break;
+    /**************************************************************************
+     *** End of Constants defitions *******************************************
+     *************************************************************************/
     case '(':
       match('(');
       goto E;
     default:
-      // se não for nenhum dos esperados acima, então não faz parte da gramática
+      // se não for nenhum dos esperados, então não faz parte da gramática
       err(FATAL, LEXICAL, "Token mismatch\n");
 	}	
  
