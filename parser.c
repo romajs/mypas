@@ -198,6 +198,7 @@ int smptype(void)
 			match(STRING);
 			return 5;
 		default:
+      // ERROR TYPE
 			return -1;
 	}
 }

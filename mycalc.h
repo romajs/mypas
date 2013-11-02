@@ -12,10 +12,20 @@
 // contadores de recursão
 int E_lvl, R_lvl, T_lvl, F_lvl;				
 
+// estrutura de operandos
+struct _operand_ {
+  double value;
+  char *lexeme;
+  int type;
+};
+
+typedef struct _operand_ Operand;
+
 // pilha de operandos (constantes numéricas apenas)	
-double operand[MAX_STACK_SIZE]; 								
+Operand operand[MAX_STACK_SIZE]; 								
 int sp;
 
+// estrutura de operadores
 struct _oper_ {
 	token_t symbol; // símbolo
 	int level; // nível de recursão (em E_lvl)

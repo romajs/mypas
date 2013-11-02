@@ -49,6 +49,8 @@ isrelop(const token_t token)
 precedence(const token_t token)
 {
 	switch(token) {
+    case NOT:
+      return 2;
     case '*':
     case '/':
     case DIV:
@@ -76,39 +78,65 @@ type(token_t token)
 {
   debug("type\n");
 	switch(token) {
-		case INTEGER:
+		case INT_CTE:
 			return 1;
-		case REAL:
+		case REAL_CTE:
 			return 2;
-		case DOUBLE:
+		case DBL_CTE:
 			return 3;
-		case BOOLEAN:
+		case BOOL_CTE:
 			return 4;
-		case STRING:
+		case STR_CTE:
 			return 5;
 		default:
+      // ERROR TYPE
 			return -1;
 	}
 }
 
+int chkType(token_t op)
+{
+  int result = -1;
+  token_t acceptableTypes[5] = {0,0,0,0,0}; // INT, REAL, DBL, BOOL, STR
+  switch(op) {
+    case NOT: break; // BOOL
+		case '+': break; // INT,REAL,DBL | STR
+		case '-': break; // INT,REAL,DBL
+		case '*': break; // INT,REAL,DBL
+		case '/': break; // INT,REAL,DBL
+    case DIV: break; // INT
+    case MOD: break; // INT,REAL,DBL
+    case AND: break; // BOOL
+    case OR:  break; // BOOL
+    case EQ:  break; // *
+    case NEQ: break; // *
+    case GRT: break; // INT,REAL,DBL
+    case GEQ: break; // INT,REAL,DBL
+    case LSR: break; // INT,REAL,DBL
+    case LEQ: break; // INT,REAL,DBL
+	}
+	return result;
+}
+
 // função que calcula o resultado entre duas variávies dado seu operador
-double calc(double x, double y, int op) { 
+double calc(double x, double y, token_t op) { 
   double result = 0.00;
   switch(op) {
-		case '+': result = x + y; break;
-		case '-': result = x - y; break;
-		case '*': result = x * y; break;
-		case '/': result = x / y; break;
-    case DIV: result = (int)(x / y); break;
-    case MOD: result = (int)x % (int)y; break;
-    case AND: result = x && y; break;    
-    case OR:  result = x || y; break;
-    case EQ:  result = x == y; break;
-    case NEQ: result = x != y; break;
-    case GRT: result = x > y; break;
-    case GEQ: result = x >= y; break;
-    case LSR: result = x < y; break;
-    case LEQ: result = x <= y; break;
+    case NOT: result = !x; break;               // BOOL
+		case '+': result = x + y; break;            // INT,REAL,DBL | STR
+		case '-': result = x - y; break;            // INT,REAL,DBL
+		case '*': result = x * y; break;            // INT,REAL,DBL
+		case '/': result = x / y; break;            // INT,REAL,DBL
+    case DIV: result = (int)(x / y); break;     // INT
+    case MOD: result = (int)x % (int)y; break;  // INT,REAL,DBL
+    case AND: result = x && y; break;           // BOOL   
+    case OR:  result = x || y; break;           // BOOL
+    case EQ:  result = x == y; break;           // *
+    case NEQ: result = x != y; break;           // *
+    case GRT: result = x > y; break;            // INT,REAL,DBL
+    case GEQ: result = x >= y; break;           // INT,REAL,DBL
+    case LSR: result = x < y; break;            // INT,REAL,DBL
+    case LEQ: result = x <= y; break;           // INT,REAL,DBL
 	}
 	debug( "(calc) %.2f %c %.2f = %.2f\n", x, op, y, result);
 	return result;
@@ -140,17 +168,21 @@ double getvalue(char const *variable) {
 }
 
 // função que empilha um 'operando' na pilha de operandos
-void push_operand(double value) {
-	operand[++sp] = value;
-	debug( "(push) operand[%d]: value = %.2f\n", sp, operand[sp]);	
+void push_operand(token_t token, const char *lexeme) {
+	++sp;
+  operand[sp].value = atof(lexeme);
+  operand[sp].type = type(token);
+	debug( "(push) operand[%d]: value = %.2f, type = %d\n", sp, 
+    operand[sp].value, operand[sp].type);	
 }
 
 // função que empilha um 'operador' na pilha de operadores
-void push_oper(token_t token) {
+void push_oper(token_t symbol, int level) {
 	++opsp;
-	oper[opsp].symbol = token;
-	oper[opsp].level = E_lvl;
-	debug( "(push) oper[%d]: symbol = \"%c\", level = %d\n", opsp, token, E_lvl);	
+	oper[opsp].symbol = symbol;
+	oper[opsp].level = level;
+	debug( "(push) oper[%d]: symbol = \"%c\", level = %d\n", opsp,
+    oper[opsp].symbol, oper[opsp].level);	
 	//debug_oper(oper, E_lvl, opsp);
 }
 
@@ -174,7 +206,8 @@ void exec_oper(void) {
         opsp, oper[opsp].symbol, oper[opsp].level);	
 			debug("(pop) operand[%d] = %.2f\n", sp, operand[sp]);
 			debug("(pop) operand[%d] = %.2f\n", sp-1, operand[sp-1]);	
-			operand[--sp] = calc(operand[sp], operand[sp+1], oper[opsp--].symbol);
+			operand[--sp].value = calc(operand[sp].value, operand[sp+1].value,
+        oper[opsp--].symbol);
 		} 
 	} 
 	//debug_oper(oper, E_lvl, opsp);
@@ -193,8 +226,8 @@ double expr(void)
 	if(lookahead == '-') { // inversão de sinal
 		match('-');
 		debug( "(signal reversion) activated.\n");
-		push_operand(0);
-		push_oper('-');
+		//push_operand(0);
+		//push_oper('-');
 	}
 
 	T: debug( "T: %d\n", ++T_lvl);	
@@ -259,7 +292,7 @@ double expr(void)
 	//exec_oper();  
   
 	if(isrelop(lookahead)) {
-		push_oper(lookahead);
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto R;
 	}
@@ -269,7 +302,7 @@ double expr(void)
 	//exec_oper();  
 
 	if(ismulop(lookahead)) {
-		push_oper(lookahead);
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto F;
 	}
@@ -279,7 +312,7 @@ double expr(void)
 	//exec_oper(); 
 
 	if(isaddop(lookahead)) {
-		push_oper(lookahead);
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto T;
 	}
@@ -292,5 +325,5 @@ double expr(void)
 	}
 
 	debug( "(pop) operand[%d] = %.2f\n", sp, operand[sp]);
-	return operand[sp--];
+	return operand[sp--].value;
 }
