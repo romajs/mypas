@@ -49,6 +49,8 @@ isrelop(const token_t token)
 precedence(const token_t token)
 {
 	switch(token) {
+    case NOT:
+      return 2;
     case '*':
     case '/':
     case DIV:
@@ -72,6 +74,7 @@ precedence(const token_t token)
   }
 }
 
+// função que retorna um valor amigável dado o tipo semântico (de um operando)
 type(token_t token)
 {
   debug("type\n");
@@ -92,8 +95,9 @@ type(token_t token)
 	}
 }
 
+// função que verifica a compatibilidade entre dois tipos (de operandos)
 typeFactor(int type1, int type2) {
-  if(type1 <= DBL_CTE && type2 <= DBL_CTE)
+  if(type1 <= 3 && type2 <= 3)
     return type1 > type2 ? type1 : type2;
   if(BOOL_CTE == type1 == type2)
     return BOOL_CTE;
@@ -102,6 +106,7 @@ typeFactor(int type1, int type2) {
   return 0;
 }
 
+// função que retorna quais os tipos suportados por um determinado operador
 int* semanticSupportedTypes(token_t op) {
   // Order: INT, REAL, DBL, BOOL, STR, ex: {0,0,0,0,0}
   switch(op) {
@@ -207,14 +212,16 @@ can_oper(void) {
 // função que executa as operações da pilha (desde que possa operar)
 void exec_oper(void) {
 	// deve operar quando:
-	if(opsp > - 1) { // se puder operar
+	if(opsp > - 1) { // se houver ao menos um operador na pilha
 		while(can_oper()) { // enquanto puder operar			
 
       // 1 - verificar quais tipos semânticos o operador suporta
       int *types = semanticSupportedTypes(oper[opsp].symbol);
       
       // 2 - verificar se o tipo dos operandos bate com os suportados pelo operador
-      if(types[operand[sp].type] && types[operand[sp+1].type]) {
+      if(!types[operand[sp].type] || !types[operand[sp+1].type]) {
+        err(FATAL, SEMANTIC, "Incorrect type for operation \"%d\"\n",
+          oper[opsp].symbol); 
         goto ERROR;
       }
       
@@ -223,20 +230,17 @@ void exec_oper(void) {
       debug("(pop) operand[%d] = %.2f\n", sp, operand[sp]);
       debug("(pop) operand[%d] = %.2f\n", sp-1, operand[sp-1]);	
       
-      // 3 - verificar se os tipos entre os operandos batem
-      int resultType = typeFactor(operand[sp].type, operand[sp+1].type);
-      if(resultType) {          
+      // 3 - verificar se os tipos entre os operandos são compatíveis
+      if(typeFactor(operand[sp].type, operand[sp+1].type)) {          
+        err(FATAL, SEMANTIC, "Operand types not compatible\n");
         goto ERROR;
       }
       
       // 4 - fazer o cáculo da operação
       operand[--sp].value =
         calc(operand[sp].value, operand[sp+1].value, oper[opsp--].symbol); 
-        
-      // 5 - determinar tipo do resultado final da operação (do operando)        
-      operand[--sp].type = resultType;
       
-      // TODO: se termiar o nível deve decrementá-lo
+      // TODO: se termiar as operações no nível deve decrementá-lo
 		} 
 	}
 ERROR:
