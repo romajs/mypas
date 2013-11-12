@@ -248,7 +248,7 @@ ERROR:
   // TODO:
 }
 
-double expr(void)
+Operand expr(void)
 { 
   debug("expr\n");
 	memset(&oper[0], 0, sizeof(oper));
@@ -360,5 +360,5 @@ double expr(void)
 	}
 
 	debug( "(pop) operand[%d] = %.2f\n", sp, operand[sp]);
-	return operand[sp--].value;
+	return operand[sp--];
 }

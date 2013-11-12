@@ -58,11 +58,11 @@ q0:
 		match(':');
 		type = typespec();/* ->simple-type attribute*/
 		match(';');
+		/* semantic rule: register the variable list with the same type
+		 * in the symbol table
+		 */symtab_add_list(id_count, id_list, type, scope);/**/
 		goto q0;
-	}
-	/* semantic rule: register the variable list with the ame type
-	 * in the symbol table
-	 *///symtab_add_list(id_count, id_list, type, scope);/**/
+	}	
 }
 /*
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
@@ -72,7 +72,7 @@ void sbrdeclr(void)
   debug("sbrdeclr\n");
 	sbrhead();
 	/* semantic action */ scope = LOCAL;
-	//int symtab_first_entry = symtab_next_entry;/**/
+	int symtab_first_entry = symtab_next_entry;/**/
 q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
@@ -81,26 +81,34 @@ q0:
 	stmblk();
 	match(';');
 	/* semantic action */ scope = GLOBAL;
-	//symtab_next_entry = symtab_first_entry;/**/
+	symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
 void sbrhead(void)
 {
+	/* semantic action */int type;/**/
+	/* semantic action */ id_count = 0; /**/
   debug("sbrhead\n");
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
+		/* semantic action */strcpy(id_list[id_count++], lexeme);
 		match(ID);
 		argdef();
+		type = 0;
 	} else {
 		match(FUNCTION);
+		/* semantic action */strcpy(id_list[id_count++], lexeme);
 		match(ID);
 		argdef();
 		match(':');
-		smptype();
+		type = smptype(); /* ->simple-type attribute*/
 	}
 	match(';');
+	/* semantic rule: register the variable list with the same type
+	 * in the symbol table
+	 */symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
  * argdef -> [ '(' arglist ')' ]
@@ -133,11 +141,15 @@ q0:
 void argspc(void)
 {
   debug("argspc\n");
+  /* semantic action */int type;/**/
 	if(lookahead == VAR)
 		match(VAR);
 	idlist();
 	match(':');
-	smptype();
+	type = smptype();
+	/* semantic rule: register the variable list with the same type
+	 * in the symbol table
+	 */symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
  * idlist -> ID { ',' ID }
@@ -263,8 +275,9 @@ void stmt(void)
 void ifstmt(void)
 {
   debug("ifstmt\n");
+  /* semantic action */Operand condition;/**/
 	match(IF);
-	expr();
+	 /* semantic action */condition = expr();
 	match(THEN); 
 	stmt();
 	if(lookahead == ELSE){
@@ -278,8 +291,9 @@ void ifstmt(void)
 void whlstmt(void)
 {
   debug("whlstmt\n");
+  /* semantic action */Operand condition;/**/
 	match(WHILE);
-	expr();
+	/* semantic action */condition = expr();
 	match(DO);
 	stmt();
 }
@@ -289,21 +303,22 @@ void whlstmt(void)
 void forstmt(void)
 {
   debug("forstmt\n");
+  /* semantic action */Operand attribution, dimension, condition;/**/
 	match(FOR);
 	match(ID);
 	if(lookahead == '[') {
 		match('[');
-		expr();
+		/* semantic action */dimension = expr();
 		match(']');
 	}
 	match(ATTR); // ':='
-	expr();
+	/* semantic action */ attribution = expr();
 	if(lookahead == TO) {
 		match(TO);
 	} else {
 		match(DOWNTO);
 	}
-	expr();
+	/* semantic action */ condition = expr();
 	match(DO);
 	stmt();
 }
@@ -313,10 +328,11 @@ void forstmt(void)
 void repstmt(void)
 {
   debug("repstmt\n");
+  /* semantic action */Operand condition;/**/
 	match(REPEAT);
 	stmtlst();
 	match(UNTIL);
-	expr();
+	/* semantic action */condition = expr();
 } 
 /*
  * idstmt -> ID [ param | [ '[' expr ']' ] [ ':=' expr ]
@@ -324,17 +340,18 @@ void repstmt(void)
 void idstmt(void)
 {
   debug("idstmt\n");
+  /* semantic action */Operand attribution, dimension;/**/
 	match(ID);
 	if(lookahead == '(') {
 		param();
 	} else {
 		if(lookahead == '[') {
 			match('[');
-			expr();
+			/* semantic action */dimension = expr();
 			match(']');
 		}
 		match(ATTR); // ATTR = ':='
-		expr();
+		/* semantic action */ attribution = expr();
 	}
 }
 /*
@@ -353,8 +370,14 @@ void param(void)
 void exprlst(void)
 {
   debug("exprlst\n");
+  /* semantic action */ Operand parameter;/**/
 q0:
-	expr();
+  /* semantic action */ id_count = 0; /**/
+	/* semantic action */ parameter = expr();
+	/* semantic action */ strcpy(id_list[id_count++], parameter.lexeme);
+	/* semantic rule: register the variable list with the same type
+	 * in the symbol table
+	 */symtab_add_list(id_count, id_list, parameter.type, scope);/**/
 	if(lookahead == ',') {
 		match(',');
 		goto q0;

@@ -83,7 +83,7 @@ void ifstmt(void);
  *
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
-extern double expr(void);
+extern Operand expr(void);
 
 /*
  * whlstmt -> WHILE expr DO stmt

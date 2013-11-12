@@ -79,7 +79,7 @@ int opsp;
  *   \-----> '(' ----> (E) ----> ')' -----/
  * 
  */
-double expr(void);
+Operand expr(void);
 
 // mulop -> '*' | '/' | DIV | MOD | AND 
 int ismulop(const token_t);
