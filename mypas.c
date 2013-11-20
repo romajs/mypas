@@ -14,35 +14,42 @@ main(int argc, char *args[])
 
 void err(int type, int nature, const char *format, ...)
 {
-  char *message = "";
-  switch(type) {
-    case INFO:
-      strcpy(message, "INFO");
-      break;
-    case WARN:
-      strcpy(message, "WARNING");
-      break;
-    case FATAL:
-      strcpy(message, "FATAL");
-      break;
-  }
-  strcpy(message, "(");
-  switch(type) {
-    case LEXICAL:
-      strcpy(message, "LEXICAL");
-      break;
-    case SYNTATIC:
-      strcpy(message, "SYNTATIC");
-      break;
-    case SEMANTIC:
-      strcpy(message, "SEMANTIC");
-      break;
-  }
-  strcpy(message, "): ");
-  strcpy(message, format);
+	char message[255];	
+	sprintf(message, "Line %d [", lineno);
+	switch(type) {
+		case INFO:
+			strcat(message, "INFO");
+			break;
+		case WARN:
+			strcat(message, "WARNING");
+			break;
+		case FATAL:
+			strcat(message, "FATAL");
+			break;
+		default:
+			strcat(message, "UNKNOW");
+			break;
+	}
+	strcat(message, "/");
+	switch(nature) {
+		case LEXICAL:
+			strcat(message, "LEXICAL");
+			break;
+		case SYNTATIC:
+			strcat(message, "SYNTATIC");
+			break;
+		case SEMANTIC:
+			strcat(message, "SEMANTIC");
+			break;
+		default:
+			strcat(message, "OTHER");
+			break;
+	}
+	strcat(message, "]: ");
+	strcat(message, format);
 	va_list arg;
 	va_start(arg, format);
 	vfprintf(object, message, arg);
 	va_end(arg);
-  exit(0);
+	exit(0);
 }

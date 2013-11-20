@@ -1,22 +1,20 @@
 #include <stdio.h>
 
 #include <lexer.h>
-#include <symtab.h>
-#include <mycalc.h>
 
-extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
-extern int id_count;
-
+/*
+ * mypas -> PROGRAM ID ';' { specification } stmblk '.'
+ */
 void mypas(void);
 /******************************************************************************
- **** object declaration scope is defined next: *******************************
- *****************************************************************************/
+**** object declaration scope is defined next: ********************************
+******************************************************************************/
 /*
  * specification ->  vardeclr | sbrdeclr
  */
 void specification(void);
 /*
- * vardeclr ->  VAR idlist ':' typespec ';'
+ * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
  */
 void vardeclr(void);
 /*
@@ -48,7 +46,7 @@ void argdef(void);
  */
 void arglist(void);
 /*
- * argspc -> [ VAR ] idlist ':' smptype
+ * argspc -> [ VAR ] idlist ':' smptype { idlist ':' smptype }
  */
 void argspc(void);
 /******************************************************************************
@@ -71,26 +69,11 @@ void stmtlst(void);
  */
 void ifstmt(void);
 /*
- * expr -> E [ relop E ]
- *
- * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
- *
- * E -> [ '-' | NOT ] term { addop term }
- *
- * addop -> '+' | '-' | OR
- *
- * term -> fact { mulop fact }
- *
- * mulop -> '*' | '/' | DIV | MOD | AND
- */
-extern Operand expr(void);
-
-/*
  * whlstmt -> WHILE expr DO stmt
  */
 void whlstmt(void);
 /*
- * forstmt -> FOR ID '[' expr ']' ':=' expr DOWNTO|TO expr DO stmt
+ * forstmt -> FOR ID indexing ':=' expr DOWNTO|TO expr DO stmt
  */
 void forstmt(void);
 /*
@@ -98,11 +81,15 @@ void forstmt(void);
  */
 void repstmt(void);
 /*
- * idstmt -> ID [ parm | { '[' expr ']' } ':=' expr ]
+ * idstmt -> ID [ parm | indexing ':=' expr ]
  */
 void idstmt(void);
 /*
- * parm -> '(' exprlst ')'
+ * indexing -> {  '[' expr ']' }
+ */
+void indexing(void);
+/*
+ * parm -> '(' [ ')' | exprlst ')']
  */
 void param(void);
 /*
@@ -110,6 +97,38 @@ void param(void);
  */
 void exprlst(void);
 
+/******************************************************************************
+*** Algebric and Boolean Expressions are defined hereafter: *******************
+******************************************************************************/
+int E_lvl, R_lvl, T_lvl, F_lvl;
+/*
+* expr -> E [ relop E ]
+*
+* relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+*
+* E -> [ '-' | NOT ] term { addop term }
+*
+* addop -> '+' | '-' | OR
+*
+* term -> fact { mulop fact }
+*
+* mulop -> '*' | '/' | DIV | MOD | AND
+*
+* fact -> ID [ param | indexing ]
+*/
+void expr(void);
+/*
+ * mulop -> '*' | '/' | DIV | MOD | AND
+ */
+int ismulop(const token_t);
+/*
+ * addop -> '+' | '-' | OR
+ */
+int isaddop(const token_t);
+/*
+ * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+ */
+int isrelop(const token_t);
 /******************************************************************************
  *** EXTERN DECLARATIONS ******************************************************
  *****************************************************************************/

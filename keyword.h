@@ -7,12 +7,12 @@
 	ENUM(PROGRAM) \
 	ENUM(VAR) \
 	ENUM(ATTR) \
-  ENUM(EQ) \
-  ENUM(NEQ) \
-  ENUM(GRT) \
-  ENUM(GEQ) \
-  ENUM(LSR) \
-  ENUM(LEQ) \
+	ENUM(EQ) \
+	ENUM(NEQ) \
+	ENUM(GRT) \
+	ENUM(GEQ) \
+	ENUM(LSR) \
+	ENUM(LEQ) \
 	ENUM(AND) \
 	ENUM(OR) \
 	ENUM(DIV) \
@@ -22,8 +22,8 @@
 	ENUM(OF) \
 	ENUM(INTEGER) \
 	ENUM(BOOLEAN) \
-  ENUM(TRUE) \
-  ENUM(FALSE) \
+	ENUM(TRUE) \
+	ENUM(FALSE) \
 	ENUM(REAL) \
 	ENUM(DOUBLE) \
 	ENUM(STRING) \
@@ -45,11 +45,11 @@
 #define GENERATE_STRING(STRING) #STRING,
 
 enum keywords {
-  FOREACH_ENUM(GENERATE_ENUM)
+	FOREACH_ENUM(GENERATE_ENUM)
 };
 
 static const char *keywords_lexeme[] = {
-  FOREACH_ENUM(GENERATE_STRING)
+	FOREACH_ENUM(GENERATE_STRING)
 };
 
 #endif // KEYWORD_H

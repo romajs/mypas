@@ -5,6 +5,8 @@ VAR
   valor, custo: Real;
   qtde: Double;
   ativo: Boolean;
+VAR
+	matrix: Array[3] of array [4] of integer;
 { Função que imprime "Hello" na saída }
 PROCEDURE SayHello;
 var
@@ -51,5 +53,29 @@ BEGIN
   FOR i := 0 TO 10 DO
     WriteLn(arr[i]);
 END;
+PROCEDURE testerelop(x, y: Integer; s: String);
 BEGIN
+  IF (x > y) THEN
+		s := 'ok'
+  ELSE IF (x >= y) THEN
+		s := 'ok'
+  ELSE IF (x < y) THEN
+		s := 'ok'
+  ELSE IF (x <= y) THEN
+		s := 'ok'
+  ELSE IF (x >= y) THEN
+		s := 'ok'
+  ELSE IF (x <> y) THEN
+		s := 'ok'		
+  ELSE
+		s := 'not ok';
+END;
+BEGIN
+	SayHello();
+	SayHello;
+	Fibonacci(5);
+	Fibonacci(6);
+	valor := qtde * custo;
+	testerelop(-1287930123.1234546789, 100.5626179281093e-308); { ashdgausgduasgdugbahisdas}
+	nome := 'abacaxi';
 END.

@@ -3,7 +3,7 @@
 // busca por parâmetros/argumentos na chamada de 'mycalc'
 // -d: modo debug, toda a execução do parser será exibida em tela
 // -t: testes, serão executado alguns testes pré-definido
-// obs: importante o uso dos flags, para permitir qualquer ordem
+// obs: importante o uso dos flags, para permitir qualquer ordem das diretivas
 void match_args(int argc, char *argv[]) {
 	int i; // manipulação de parâmetros
 	//fprintf(object, "argc: %i\n", argc);

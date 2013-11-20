@@ -1,26 +1,21 @@
 #include <parser.h>
 
-#define 	GLOBAL	0
-#define	LOCAL		1
-/* semantic variable*/int scope;/**/
-
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
  */
 void mypas(void)
 {
-  debug("mypas\n");
+	debug("mypas\n");
 	// clear everything before start
 	lookahead = EOF;
 	lexeme[0] = 0;
 
-  // call gramar initial symbol
+	// call gramar initial symbol
 	lookahead = gettoken(source);
 
 	match(PROGRAM);
 	match(ID);
 	match(';');
-	/* semantic action */ scope = GLOBAL;/**/
 q0:
 	if(lookahead != BEGIN) {
 		specification();
@@ -29,16 +24,16 @@ q0:
 	stmblk();
 	match('.');
 }	
-/******************************************************************************
- **** object declaration scope is defined next: *******************************
- *****************************************************************************/
+/*****************************************************************************
+*** object declaration scope is defined next: ********************************
+*****************************************************************************/
 /*
  * specification -> vardeclr | sbrdeclr
  */
 void specification(void)
 {	
-  debug("specification\n");
-	if(lookahead == VAR ) {
+	debug("specification\n");
+	if(lookahead == VAR) {
 		vardeclr();
 	} else {
 		sbrdeclr();
@@ -47,20 +42,18 @@ void specification(void)
 /*
  * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
  */
+/** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
+	de uma declaração por VAR **/
 void vardeclr(void)
 {
-  debug("vardeclr\n");
-	/* semantic action */int type;/**/
+	debug("vardeclr\n");
 	match(VAR);
 q0:
 	if(lookahead == ID) {
-		idlist(); /* -> variable-name list*/
+		idlist();
 		match(':');
-		type = typespec();/* ->simple-type attribute*/
+		typespec();
 		match(';');
-		/* semantic rule: register the variable list with the same type
-		 * in the symbol table
-		 */symtab_add_list(id_count, id_list, type, scope);/**/
 		goto q0;
 	}	
 }
@@ -69,10 +62,8 @@ q0:
  */
 void sbrdeclr(void)	
 {
-  debug("sbrdeclr\n");
+	debug("sbrdeclr\n");
 	sbrhead();
-	/* semantic action */ scope = LOCAL;
-	int symtab_first_entry = symtab_next_entry;/**/
 q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
@@ -80,42 +71,32 @@ q0:
 	}
 	stmblk();
 	match(';');
-	/* semantic action */ scope = GLOBAL;
-	symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
 void sbrhead(void)
 {
-	/* semantic action */int type;/**/
-	/* semantic action */ id_count = 0; /**/
-  debug("sbrhead\n");
+	debug("sbrhead\n");
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
-		/* semantic action */strcpy(id_list[id_count++], lexeme);
 		match(ID);
 		argdef();
-		type = 0;
 	} else {
 		match(FUNCTION);
-		/* semantic action */strcpy(id_list[id_count++], lexeme);
 		match(ID);
 		argdef();
 		match(':');
-		type = smptype(); /* ->simple-type attribute*/
+		smptype();
 	}
 	match(';');
-	/* semantic rule: register the variable list with the same type
-	 * in the symbol table
-	 */symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
  * argdef -> [ '(' arglist ')' ]
  */
 void argdef(void)
 {
-  debug("argdef\n");
+	debug("argdef\n");
 	if(lookahead == '(') {
 		match('(');
 		arglist();
@@ -127,7 +108,7 @@ void argdef(void)
  */
 void arglist(void)
 {
-  debug("arglist\n");
+	debug("arglist\n");
 q0:
 	argspc();
 	if(lookahead == ';') {
@@ -136,32 +117,26 @@ q0:
 	}
 }
 /*
- * argspc -> [ VAR ] idlist ':' smptype
+ * argspc -> [ VAR ] idlist ':' smptype { idlist ':' smptype }
  */
+/** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
+	de uma declaração por VAR **/
 void argspc(void)
 {
-  debug("argspc\n");
-  /* semantic action */int type;/**/
+	debug("argspc\n");
 	if(lookahead == VAR)
-		match(VAR);
+	match(VAR);
 	idlist();
 	match(':');
-	type = smptype();
-	/* semantic rule: register the variable list with the same type
-	 * in the symbol table
-	 */symtab_add_list(id_count, id_list, type, scope);/**/
+	smptype();
 }
 /*
- * idlist -> ID { ',' ID }
- */
-char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
-int id_count = 0;
+* idlist -> ID { ',' ID }
+*/
 void idlist(void)
 {
-  debug("idlist\n");
-	/* semantic action */ id_count = 0; /**/
+	debug("idlist\n");
 q0:
-	/* semantic action */ strcpy(id_list[id_count++], lexeme); /**/
 	match(ID);
 	if(lookahead == ',') {
 		match(',');	
@@ -173,7 +148,7 @@ q0:
  */
 typespec(void)
 {
-  debug("typespec\n");
+	debug("typespec\n");
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
@@ -184,7 +159,7 @@ q0:
 		goto q0;
 	}
 	else {
-		return smptype();
+		smptype();
 	}
 }
 /*
@@ -192,37 +167,37 @@ q0:
  */
 int smptype(void)
 {
-  debug("smptype\n");
+	debug("smptype\n");
 	switch(lookahead) {
-		case INTEGER:
-			match(INTEGER);
-			return 1;
-		case REAL:
-			match(REAL);
-			return 2;
-		case DOUBLE:
-			match(DOUBLE);
-			return 3;
-		case BOOLEAN:
-			match(BOOLEAN);
-			return 4;
-		case STRING:
-			match(STRING);
-			return 5;
-		default:
-      // ERROR TYPE
-			return -1;
+	case INTEGER:
+		match(INTEGER);
+		return 1;
+	case REAL:
+		match(REAL);
+		return 2;
+	case DOUBLE:
+		match(DOUBLE);
+		return 3;
+	case BOOLEAN:
+		match(BOOLEAN);
+		return 4;
+	case STRING:
+		match(STRING);
+		return 5;
+	default:
+		// ERROR TYPE
+		return -1;
 	}
 }
-/******************************************************************************
- *** Imperative scope is defined hereafter: ***********************************
- *****************************************************************************/
+/*****************************************************************************
+*** Imperative scope is defined hereafter: ***********************************
+*****************************************************************************/
 /*
  * stmblk -> BEGIN stmtlst END
  */
 void stmblk(void)
 {
-  debug("stmblk\n");
+	debug("stmblk\n");
 	match(BEGIN);
 	stmtlst();
 	match(END);
@@ -232,7 +207,7 @@ void stmblk(void)
  */
 void stmtlst(void)
 {
-  debug("stmlst\n");
+	debug("stmlst\n");
 q0:
 	stmt();
 	if(lookahead == ';') {
@@ -241,32 +216,32 @@ q0:
 	}
 }
 /*
- * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
- */
+* stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
+*/
 void stmt(void)
 {
-  debug("stmt\n");
+	debug("stmt\n");
 	switch(lookahead){
-		case BEGIN:
-			stmblk();
-			break;
-		case IF:
-			ifstmt();
-			break;
-		case WHILE:
-			whlstmt();
-			break;
-		case FOR:
-			forstmt();
-			break;
-		case REPEAT:
-			repstmt();
-			break;
-		case ID:
-			idstmt();
-			break;
-		default:
-			;
+	case BEGIN:
+		stmblk();
+		break;
+	case IF:
+		ifstmt();
+		break;
+	case WHILE:
+		whlstmt();
+		break;
+	case FOR:
+		forstmt();
+		break;
+	case REPEAT:
+		repstmt();
+		break;
+	case ID:
+		idstmt();
+		break;
+	default:
+		;
 	}
 }
 /* 
@@ -274,10 +249,9 @@ void stmt(void)
  */
 void ifstmt(void)
 {
-  debug("ifstmt\n");
-  /* semantic action */Operand condition;/**/
+	debug("ifstmt\n");
 	match(IF);
-	 /* semantic action */condition = expr();
+	expr();
 	match(THEN); 
 	stmt();
 	if(lookahead == ELSE){
@@ -290,35 +264,29 @@ void ifstmt(void)
  */
 void whlstmt(void)
 {
-  debug("whlstmt\n");
-  /* semantic action */Operand condition;/**/
+	debug("whlstmt\n");
 	match(WHILE);
-	/* semantic action */condition = expr();
+	expr();
 	match(DO);
 	stmt();
 }
 /*
- * forstmt -> FOR ID [ '[' expr ']' ] ':=' expr DOWNTO|TO expr DO stmt
+ * forstmt -> FOR ID indexing ':=' expr DOWNTO|TO expr DO stmt
  */
 void forstmt(void)
 {
-  debug("forstmt\n");
-  /* semantic action */Operand attribution, dimension, condition;/**/
+	debug("forstmt\n");
 	match(FOR);
 	match(ID);
-	if(lookahead == '[') {
-		match('[');
-		/* semantic action */dimension = expr();
-		match(']');
-	}
+	indexing();
 	match(ATTR); // ':='
-	/* semantic action */ attribution = expr();
+	expr();
 	if(lookahead == TO) {
 		match(TO);
 	} else {
 		match(DOWNTO);
 	}
-	/* semantic action */ condition = expr();
+	expr();
 	match(DO);
 	stmt();
 }
@@ -327,78 +295,220 @@ void forstmt(void)
  */
 void repstmt(void)
 {
-  debug("repstmt\n");
-  /* semantic action */Operand condition;/**/
+	debug("repstmt\n");
 	match(REPEAT);
 	stmtlst();
 	match(UNTIL);
-	/* semantic action */condition = expr();
+	expr();
 } 
 /*
- * idstmt -> ID [ param | [ '[' expr ']' ] [ ':=' expr ]
+ * idstmt -> ID [ param | indexing ':=' expr ]
  */
+ /**OBS: indexing é opcional**/
 void idstmt(void)
 {
-  debug("idstmt\n");
-  /* semantic action */Operand attribution, dimension;/**/
+	debug("idstmt\n");
 	match(ID);
 	if(lookahead == '(') {
 		param();
 	} else {
-		if(lookahead == '[') {
-			match('[');
-			/* semantic action */dimension = expr();
-			match(']');
+		indexing();
+		if(lookahead == ATTR) {
+			match(ATTR); // ATTR = ':='
+			expr();
 		}
-		match(ATTR); // ATTR = ':='
-		/* semantic action */ attribution = expr();
 	}
 }
 /*
- * parm -> '(' exprlst ')'
+ * indexing -> {  '[' expr ']' }
  */
+void indexing(void)
+{
+	debug("indexing\n");
+q0:
+  if(lookahead == '[') {
+	 match('[');
+	 expr();
+	 match(']');
+	 goto q0;
+  }
+}
+/*
+ * parm -> '(' [ ')' | exprlst ')']
+ */
+/**OBS: exprlst é opcional**/
 void param(void)
 {
-  debug("param\n");
-	match('(');
-	exprlst();
-	match(')');
+	debug("param\n");
+	if(lookahead == '(') {
+		match('(');
+		if(lookahead == ')') {
+			match(')');
+		} else {
+			exprlst();
+			match(')');
+		}
+	}
 }
 /*
  * exprlst -> expr { ',' expr }
  */
 void exprlst(void)
 {
-  debug("exprlst\n");
-  /* semantic action */ Operand parameter;/**/
+	debug("exprlst\n");
 q0:
-  /* semantic action */ id_count = 0; /**/
-	/* semantic action */ parameter = expr();
-	/* semantic action */ strcpy(id_list[id_count++], parameter.lexeme);
-	/* semantic rule: register the variable list with the same type
-	 * in the symbol table
-	 */symtab_add_list(id_count, id_list, parameter.type, scope);/**/
+	expr();
 	if(lookahead == ',') {
 		match(',');
 		goto q0;
 	}
 }
 /******************************************************************************
- *** Algebric and Boolean Expressions are defined hereafter: ******************
- *****************************************************************************/
+*** Algebric and Boolean Expressions are defined hereafter: *******************
+******************************************************************************/
 /*
- * expr -> E [ relop E ]
- *
- * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
- *
- * E -> [ '-' | NOT ] term { addop term }
- *
- * addop -> '+' | '-' | OR
- *
- * term -> fact { mulop fact }
- *
+* expr -> E [ relop E ]
+*
+* relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+*
+* E -> [ '-' | NOT ] term { addop term }
+*
+* addop -> '+' | '-' | OR
+*
+* term -> fact { mulop fact }
+*
+* mulop -> '*' | '/' | DIV | MOD | AND
+*
+* fact -> ID [ param | indexing ]
+*/
+void expr(void)
+{ 
+	debug("expr\n");
+	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
+
+	E: debug( "E: %d\n", ++E_lvl);
+
+	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
+    case '-':
+    case NOT:
+      debug( "(signal reversion) activated.\n");
+      match(lookahead);
+      break;
+	}
+
+	T: debug("T: %d\n", ++T_lvl);	
+  
+	R: debug("R: %d\n", ++R_lvl);
+
+	F: debug("F: %d\n", ++F_lvl); 	
+
+	switch(lookahead) {
+    case ID:
+      match(ID);
+		if(lookahead == '(') {
+			param();
+		} 
+		/**OBS: indexing é opcional**/
+		indexing();
+      break;
+    /**************************************************************************
+    *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
+    **************************************************************************/
+    case TRUE: 
+    case FALSE:
+    case INT_CTE:
+    case REAL_CTE:
+    case DBL_CTE:
+    case STR_CTE:
+      match(lookahead);
+      break;
+    /**************************************************************************
+     *** End of Constants defitions *******************************************
+     *************************************************************************/
+    case '(':
+      match('(');
+      goto E;
+    default:
+      // se não for nenhum dos esperados, então não faz parte da gramática
+      err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
+	}	
+ 
+	_F: debug( "_F: %d\n", --F_lvl);
+  
+	if(isrelop(lookahead)) {
+		match(lookahead);
+		goto R;
+	}
+ 
+	_R: debug( "_R: %d\n", --R_lvl);
+
+	if(ismulop(lookahead)) {
+		match(lookahead);
+		goto F;
+	}
+
+	_T: debug( "_T: %d\n", --T_lvl);
+
+	if(isaddop(lookahead)) {
+		match(lookahead);
+		goto T;
+	}
+
+	_E: debug( "_E: %d\n", --E_lvl);
+
+	if(E_lvl > -1) {
+		match(')');
+		goto _F;
+	}
+}
+/*
  * mulop -> '*' | '/' | DIV | MOD | AND
- *
- * fact -> ID [ param | [ '[' expr ']' ] [ ':=' expr ]
  */
-// Implementation in file 'mycalc.c'
+ismulop(const token_t token)
+{
+	debug("ismulop\n");
+	switch(token) {
+		case '*':
+		case '/':
+		case DIV:
+		case MOD:
+		case AND:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
+/*
+ * addop -> '+' | '-' | OR
+ */
+isaddop(const token_t token)
+{
+	debug("isaddop\n");
+	switch(token) {
+		case '+':
+		case '-':
+		case OR:
+			return 1;
+		default:
+			return 0;
+	}
+}
+/*
+ * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
+ */
+isrelop(const token_t token)
+{
+	debug("isrelop\n");
+	switch(token) {
+		case EQ:
+		case NEQ:
+		case GRT:
+		case GEQ:
+		case LSR:
+		case LEQ:
+			return 1;
+		default:
+			return 0;
+	}
+}

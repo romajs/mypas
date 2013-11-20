@@ -15,3 +15,5 @@ extern void debug(const char *, ...);
 extern void match_args(int, char *[]);
 
 void err(int, int, const char *, ...);
+
+extern int lineno;
