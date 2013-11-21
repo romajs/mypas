@@ -1,6 +1,10 @@
 #include <stdio.h>
 
 #include <lexer.h>
+#include <symtab.h>
+
+extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
+extern int id_count;
 
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
@@ -139,6 +143,6 @@ extern FILE *object;
 
 extern void match(token_t);
 
-extern int symtab_add_list(int, char const *[], int, int);
+//extern int symtab_add_list(int, char const *[], int, int);
 
 extern void err(int, int, const char *, ...);

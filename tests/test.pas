@@ -53,19 +53,19 @@ BEGIN
   FOR i := 0 TO 10 DO
     WriteLn(arr[i]);
 END;
-PROCEDURE testerelop(x, y: Integer; s: String);
+PROCEDURE testerelop(z, y: Integer; s: String);
 BEGIN
-  IF (x > y) THEN
+  IF (z > y) THEN
 		s := 'ok'
-  ELSE IF (x >= y) THEN
+  ELSE IF (z >= y) THEN
 		s := 'ok'
-  ELSE IF (x < y) THEN
+  ELSE IF (z < y) THEN
 		s := 'ok'
-  ELSE IF (x <= y) THEN
+  ELSE IF (z <= y) THEN
 		s := 'ok'
-  ELSE IF (x >= y) THEN
+  ELSE IF (z >= y) THEN
 		s := 'ok'
-  ELSE IF (x <> y) THEN
+  ELSE IF (z <> y) THEN
 		s := 'ok'		
   ELSE
 		s := 'not ok';

@@ -1,5 +1,10 @@
 #include <parser.h>
 
+#define 	GLOBAL	0
+#define	LOCAL		1
+
+/*sa*/int scope;/**/
+
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
  */
@@ -16,6 +21,7 @@ void mypas(void)
 	match(PROGRAM);
 	match(ID);
 	match(';');
+	/*sa*/ scope = GLOBAL;/**/
 q0:
 	if(lookahead != BEGIN) {
 		specification();
@@ -47,13 +53,15 @@ void specification(void)
 void vardeclr(void)
 {
 	debug("vardeclr\n");
+	/*sa*/int type;/**/
 	match(VAR);
 q0:
 	if(lookahead == ID) {
 		idlist();
 		match(':');
-		typespec();
+		/*sa*/type = typespec();/**/
 		match(';');
+		/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
 		goto q0;
 	}	
 }
@@ -64,6 +72,8 @@ void sbrdeclr(void)
 {
 	debug("sbrdeclr\n");
 	sbrhead();
+	/*sa*/scope = LOCAL;	
+	/**/int symtab_first_entry = symtab_next_entry;/**/
 q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
@@ -71,6 +81,8 @@ q0:
 	}
 	stmblk();
 	match(';');
+	/*sa*/scope = GLOBAL;/**/
+	/**/symtab_next_entry = symtab_first_entry;/**/
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
@@ -78,17 +90,25 @@ q0:
 void sbrhead(void)
 {
 	debug("sbrhead\n");
+	/*sa*/int type;/**/
+	/*sa*/char *templexeme;/**/
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
+		/*sa*/strcpy(templexeme, lexeme);/**/
 		match(ID);
 		argdef();
+		/*sa*/type = 0;/**/
 	} else {
 		match(FUNCTION);
+		/*sa*/strcpy(templexeme, lexeme);/**/
 		match(ID);
 		argdef();
 		match(':');
-		smptype();
+		/*sa*/type = smptype();/**/
 	}
+	/*sa*/id_count = 0;/**/
+	/*sa*/strcpy(id_list[id_count++], templexeme);/**/
+	/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
 	match(';');
 }
 /*
@@ -124,19 +144,25 @@ q0:
 void argspc(void)
 {
 	debug("argspc\n");
+	/*sa*/int type;/**/
 	if(lookahead == VAR)
 	match(VAR);
 	idlist();
 	match(':');
-	smptype();
+	type = smptype();
+	/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
 }
 /*
 * idlist -> ID { ',' ID }
 */
+char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
+int id_count = 0;
 void idlist(void)
 {
 	debug("idlist\n");
+	/*sa*/id_count = 0;/**/
 q0:
+	/*sa*/strcpy(id_list[id_count++], lexeme);/**/
 	match(ID);
 	if(lookahead == ',') {
 		match(',');	
