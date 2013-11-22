@@ -60,14 +60,25 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 		symtab[symtab_next_entry].scope = scope;
 		symtab[symtab_next_entry].attributes = 0;
 		symtab[symtab_next_entry].indirections = 0;
+		debug("added to symtab[%d]: { name = %s, scope = %d, type = %d, ind = %d, attr = %d }\n",
+			symtab_next_entry, symtab[symtab_next_entry].name, symtab[symtab_next_entry].scope,
+			symtab[symtab_next_entry].type, symtab[symtab_next_entry].indirections, symtab[symtab_next_entry].attributes);
 		symtab_next_entry++;
 	}
 	return symtab_next_entry;
 }
 
-void symtab_add_list2(int n, SEMANTIC_ATTRIB symlist[MAX_SYMTAB_ENTRIES])
+int symtab_add(int n, SEMANTIC_ATTRIB satrb)
 {
-	// TODO:
+	debug("<symtab_add>\n");	
+	int entry = symtab_lookup(satrb.name); // busca pela variavel declarada (lexema)
+	debug("entry: %d\n", entry);		
+	if(entry && symtab[entry].scope >= satrb.scope){ // verifica se já existe
+		err(FATAL, SEMANTIC, "%s already defined in current scope\n", satrb.name);
+		return -1;
+	}
+	symtab[symtab_next_entry++] = satrb;
+	return symtab_next_entry;
 }
 
 void symtab_asgm_params(int from, int to, SEMANTIC_ATTRIB *satbr) {

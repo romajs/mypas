@@ -10,7 +10,7 @@
  */
 void mypas(void)
 {
-	debug("mypas\n");
+	debug("<mypas>\n");
 	// clear everything before start
 	lookahead = EOF;
 	lexeme[0] = 0;
@@ -23,12 +23,14 @@ void mypas(void)
 	match(';');
 	/*sa*/scope = GLOBAL;/**/
 q0:
+	debug("mypas:q0\n");
 	if(lookahead != BEGIN) {
 		specification();
 		goto q0;
 	}
 	stmblk();
 	match('.');
+	debug("</mypas>\n");
 }	
 /*****************************************************************************
 *** object declaration scope is defined next: ********************************
@@ -38,12 +40,13 @@ q0:
  */
 void specification(void)
 {	
-	debug("specification\n");
+	debug("<specification>\n");
 	if(lookahead == VAR) {
 		vardeclr();
 	} else {
 		sbrdeclr();
 	}	
+	debug("</specification>\n");
 }
 /*
  * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
@@ -52,7 +55,7 @@ void specification(void)
 	de uma declaração por VAR **/
 void vardeclr(void)
 {
-	debug("vardeclr\n");
+	debug("<vardeclr>\n");
 	/*sa*/SEMANTIC_ATTRIB *satrb;/**/
 	match(VAR);
 q0:
@@ -65,13 +68,14 @@ q0:
 		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope);/**/
 		goto q0;
 	}	
+	debug("</vardeclr>\n");
 }
 /*
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
  */
 void sbrdeclr(void)	
 {
-	debug("sbrdeclr\n");
+	debug("<sbrdeclr>\n");
 	// troca o escopo para LOCAL para as declarações de argumentos e variaveis da subrotina
 	/*sa*/scope = LOCAL;/**/	
 	/**/int symtab_first_entry = symtab_next_entry;/**/
@@ -86,17 +90,19 @@ q0:
 	}
 	stmblk();
 	match(';');
-	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
 	
 	// TODO: apagar todas as declarações locais de 'symlist'
-	/**/symtab_next_entry = symtab_first_entry;/**/ 	
+	/**/symtab_next_entry = symtab_first_entry;/**/ 		
+	
+	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
 	
 	// completa atributros de 'satrb'
 	/*sa*/satrb->scope = scope;/**/	
 	/*sa*/satrb->indirections = 0;/**/
 	
-	// TODO: adicionar a subrotina a tabela de símbolos
-	symtab[symtab_next_entry++] = *satrb;
+	//  adiciona a subrotina a tabela de símbolos
+	symtab_add(*satrb);
+	debug("</sbrdeclr>\n");
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'

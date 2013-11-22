@@ -28,7 +28,7 @@ int symtab_lookup(const char *);
 
 int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int);
 
-void symtab_add_list2(int n, SEMANTIC_ATTRIB[MAX_SYMTAB_ENTRIES]);
+int symtab_add_list2(int n, SEMANTIC_ATTRIB);
 
 extern FILE *source;
 
