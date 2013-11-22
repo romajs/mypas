@@ -53,15 +53,16 @@ void specification(void)
 void vardeclr(void)
 {
 	debug("vardeclr\n");
-	/*sa*/int type;/**/
+	/*sa*/SEMANTIC_ATTRIB *satrb;/**/
 	match(VAR);
 q0:
+	/*sa*/satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
 	if(lookahead == ID) {
 		idlist();
 		match(':');
-		/*sa*/type = typespec();/**/
+		/*sa*/typespec(satrb);/**/
 		match(';');
-		/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
+		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope);/**/
 		goto q0;
 	}	
 }
@@ -74,8 +75,11 @@ void sbrdeclr(void)
 	// troca o escopo para LOCAL para as declarações de argumentos e variaveis da subrotina
 	/*sa*/scope = LOCAL;/**/	
 	/**/int symtab_first_entry = symtab_next_entry;/**/
-	/*sa*/SEMANTIC_ATTRIB subroutine = sbrhead();/**/
+	/*sa*/SEMANTIC_ATTRIB *satrb;/**/
+	/*sa*/sbrhead(satrb);/**/
 q0:
+	/*sa*/satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
+
 	if(lookahead != BEGIN) {
 		vardeclr();
 		goto q0;
@@ -83,50 +87,47 @@ q0:
 	stmblk();
 	match(';');
 	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
-	/*sa*/subroutine.scope = scope;/**/
-	// TODO: limpar symtab para não ter problemas futuramente com lixo
-	/**/symtab_next_entry = symtab_first_entry;/**/ // apaga todas as declarações locais
 	
-	// adiciona a subrotina a tabela de simoblos
-	// TODO: precisa verificar se já existe
-	symtab[symtab_next_entry++] = subroutine;
+	// TODO: apagar todas as declarações locais de 'symlist'
+	/**/symtab_next_entry = symtab_first_entry;/**/ 	
+	
+	// completa atributros de 'satrb'
+	/*sa*/satrb->scope = scope;/**/	
+	/*sa*/satrb->indirections = 0;/**/
+	
+	// TODO: adicionar a subrotina a tabela de símbolos
+	symtab[symtab_next_entry++] = *satrb;
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
-SEMANTIC_ATTRIB sbrhead(void)
+void sbrhead(SEMANTIC_ATTRIB *satrb)
 {
 	debug("sbrhead\n");
-	/*sa*/SEMANTIC_ATTRIB subroutine;/**/ // lexema da subrotina
 	/*sa*/int symtab_first_entry = symtab_next_entry;/**/
 	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
-		/*sa*/strcpy(subroutine.name, lexeme);/**/ // salva o lexema da subrotina
+		/*sa*/strcpy(satrb->name, lexeme);/**/ // salva o lexema da subrotina
 		match(ID);
 		argdef();
-		/*sa*/subroutine.type = 0;/**/
+		/*sa*/satrb->type = 0;/**/ // (SEM TIPO)
 	} else {
 		match(FUNCTION);
-		/*sa*/strcpy(subroutine.name, lexeme);/**/ // salva o lexema da subrotina
+		/*sa*/strcpy(satrb->name, lexeme);/**/ // salva o lexema da subrotina
 		match(ID);
 		argdef();
 		match(':');
-		/*sa*/subroutine.type = smptype();/**/
+		/*sa*/satrb->type = smptype();/**/
 	}	
 	// TODO:: copiar variaveis declaradas em 'argdef' para os parametros da subrotina
-	subroutine.param = malloc((symtab_next_entry - symtab_first_entry) *  sizeof(SEMANTIC_ATTRIB));
+	symtab_asgm_params(symtab_first_entry, symtab_next_entry, &satrb->param);
+	/*satrb->param = malloc((symtab_next_entry - symtab_first_entry) *  sizeof(SEMANTIC_ATTRIB));
 	int i;
-	for(i = symtab_first_entry, subroutine.attributes = 0; i < symtab_next_entry; i++, subroutine.attributes++) {
-		strcpy(subroutine.param[subroutine.attributes].name, symtab[i].name);		
-		subroutine.param[subroutine.attributes].scope = symtab[i].scope;
-		subroutine.param[subroutine.attributes].type = symtab[i].type;		
-		subroutine.param[subroutine.attributes].offset = symtab[i].offset;
-		// ...
-	}
-	subroutine.indirections = 0;
+	for(i = symtab_first_entry, satrb->attributes = 0; i < symtab_next_entry; i++, satrb->attributes++) {
+		memcpy(&satrb->param[satrb->attributes], &symtab[i], sizeof(SEMANTIC_ATTRIB));
+	}*/
 	match(';');
-	return subroutine;
 }
 /*
  * argdef -> [ '(' arglist ')' ]
@@ -154,10 +155,8 @@ q0:
 	}
 }
 /*
- * argspc -> [ VAR ] idlist ':' smptype { idlist ':' smptype }
+ * argspc -> [ VAR ] idlist ':' smptype
  */
-/** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
-	de uma declaração por VAR **/
 void argspc(void)
 {
 	debug("argspc\n");
@@ -189,20 +188,24 @@ q0:
 /*
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
-typespec(void)
+void typespec(SEMANTIC_ATTRIB *satrb)
 {
 	debug("typespec\n");
+	/*sa*/satrb->indirections = 0;/**/
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
+		/*sa*/satrb->dimension[satrb->indirections++] = atoi(lexeme);/**/
+		/*sa*/satrb->type = 0;/**/ // CUIDADO CONFUNDIR COM PROCEDURE!!!
 		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
 		match(']');
 		match(OF);
 		goto q0;
 	}
 	else {
-		smptype();
+		satrb->type = smptype();
+		/*sa*/satrb->indirections = 0;/**/
 	}
 }
 /*

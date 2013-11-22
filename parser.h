@@ -32,7 +32,7 @@ void idlist(void);
 /*
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
-int typespec(void);
+void typespec(SEMANTIC_ATTRIB *);
 /*
  * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
  */
@@ -40,7 +40,7 @@ int smptype(void);
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
-SEMANTIC_ATTRIB sbrhead(void);
+void sbrhead(SEMANTIC_ATTRIB *);
 /*
  * argdef -> [ '(' arglist ')' ]
  */

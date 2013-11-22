@@ -1,5 +1,6 @@
 /*@<symtab.c>*/
 #include <string.h>
+#include <stdlib.h>
 
 #include <symtab.h>
 
@@ -62,4 +63,18 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 		symtab_next_entry++;
 	}
 	return symtab_next_entry;
+}
+
+void symtab_add_list2(int n, SEMANTIC_ATTRIB symlist[MAX_SYMTAB_ENTRIES])
+{
+	// TODO:
+}
+
+void symtab_asgm_params(int from, int to, SEMANTIC_ATTRIB *satbr) {
+	debug("symtab_asgm_params\n");
+	satbr->param = malloc((to - from) * sizeof(SEMANTIC_ATTRIB));
+	int i;
+	for(i = from, satbr->attributes = 0; i < to; i++, satbr->attributes++) {
+		memcpy(&satbr->param[satbr->attributes], &symtab[i], sizeof(SEMANTIC_ATTRIB));
+	}
 }
