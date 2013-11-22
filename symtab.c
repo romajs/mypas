@@ -17,19 +17,19 @@ symtab_lookup(const char *query)
 		debug("symtab[%d]: { name = %s, scope = %d, type = %d, ind = %d, attr = %d }\n",
 			i, symtab[i].name, symtab[i].scope, symtab[i].type, symtab[i].indirections,
 			symtab[i].attributes);
-		int j;
+		int j = 0;
+		if(symtab[i].indirections) {
+			debug("\tdimensions: ");
+			debug("%d ", symtab[i].dimension[j]);
+			for(j = 1; j < symtab[i].indirections; j++) {
+				debug("x %d ", symtab[i].dimension[j]);
+			}
+			debug("\n");
+		}
 		for(j = 0; j < symtab[i].attributes; j++) {
 			debug("\t[%d]: { name = %s, scope = %d, type = %d, ind = %d }\n",
 				j, symtab[i].param[j].name, symtab[i].param[j].scope, symtab[i].param[j].type,
 				symtab[i].param[j].indirections);
-		}
-		if(symtab[i].indirections) {
-			debug("\tdimensions: ");
-			debug("%d ", symtab[i].dimension[0]);
-			for(j = 1; j < symtab[i].indirections; j++) {
-				debug("x %d ", symtab[i].dimension[j]);
-			}
-			debug("\n: ");
 		}
 		
 		if(strcmp(symtab[i].name, query) == 0) {
@@ -39,7 +39,8 @@ symtab_lookup(const char *query)
 	return 0;
 }
 
-symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int type, int scope)
+symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int type, int scope,
+	int indirections, int dimension[MAX_IND_SIZE])
 {
 	debug("symtab_add_list\n");
 	debug("n: %d\n", n);
@@ -59,7 +60,8 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 		symtab[symtab_next_entry].type = type;
 		symtab[symtab_next_entry].scope = scope;
 		symtab[symtab_next_entry].attributes = 0;
-		symtab[symtab_next_entry].indirections = 0;
+		symtab[symtab_next_entry].indirections = indirections;
+		memcpy(symtab[symtab_next_entry].dimension, dimension, sizeof(dimension));
 		debug("added to symtab[%d]: { name = %s, scope = %d, type = %d, ind = %d, attr = %d }\n",
 			symtab_next_entry, symtab[symtab_next_entry].name, symtab[symtab_next_entry].scope,
 			symtab[symtab_next_entry].type, symtab[symtab_next_entry].indirections, symtab[symtab_next_entry].attributes);
@@ -68,17 +70,21 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 	return symtab_next_entry;
 }
 
-int symtab_add(int n, SEMANTIC_ATTRIB satrb)
+int symtab_add(SEMANTIC_ATTRIB *satrb)
 {
 	debug("<symtab_add>\n");	
-	int entry = symtab_lookup(satrb.name); // busca pela variavel declarada (lexema)
+	int entry = symtab_lookup(satrb->name); // busca pela variavel declarada (lexema)
 	debug("entry: %d\n", entry);		
-	if(entry && symtab[entry].scope >= satrb.scope){ // verifica se já existe
-		err(FATAL, SEMANTIC, "%s already defined in current scope\n", satrb.name);
+	if(entry && symtab[entry].scope >= satrb->scope){ // verifica se já existe
+		err(FATAL, SEMANTIC, "%s already defined in current scope\n", satrb->name);
 		return -1;
 	}
-	symtab[symtab_next_entry++] = satrb;
-	return symtab_next_entry;
+	symtab[symtab_next_entry] = *satrb;
+	//memcpy(&symtab[symtab_next_entry], satrb, sizeof(satrb));
+	debug("added to symtab[%d]: { name = %s, scope = %d, type = %d, ind = %d, attr = %d }\n",
+			symtab_next_entry, symtab[symtab_next_entry].name, symtab[symtab_next_entry].scope,
+			symtab[symtab_next_entry].type, symtab[symtab_next_entry].indirections, symtab[symtab_next_entry].attributes);
+	return ++symtab_next_entry;
 }
 
 void symtab_asgm_params(int from, int to, SEMANTIC_ATTRIB *satbr) {

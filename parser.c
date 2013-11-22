@@ -65,7 +65,7 @@ q0:
 		match(':');
 		/*sa*/typespec(satrb);/**/
 		match(';');
-		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope);/**/
+		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope, satrb->indirections, satrb->dimension);/**/
 		goto q0;
 	}	
 	debug("</vardeclr>\n");
@@ -79,11 +79,10 @@ void sbrdeclr(void)
 	// troca o escopo para LOCAL para as declarações de argumentos e variaveis da subrotina
 	/*sa*/scope = LOCAL;/**/	
 	/**/int symtab_first_entry = symtab_next_entry;/**/
-	/*sa*/SEMANTIC_ATTRIB *satrb;/**/
+	/*sa*/SEMANTIC_ATTRIB *satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
 	/*sa*/sbrhead(satrb);/**/
+	
 q0:
-	/*sa*/satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
-
 	if(lookahead != BEGIN) {
 		vardeclr();
 		goto q0;
@@ -96,12 +95,12 @@ q0:
 	
 	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
 	
-	// completa atributros de 'satrb'
+	// completa atributos de 'satrb'
 	/*sa*/satrb->scope = scope;/**/	
 	/*sa*/satrb->indirections = 0;/**/
 	
 	//  adiciona a subrotina a tabela de símbolos
-	symtab_add(*satrb);
+	symtab_add(satrb);
 	debug("</sbrdeclr>\n");
 }
 /*
@@ -127,7 +126,7 @@ void sbrhead(SEMANTIC_ATTRIB *satrb)
 		/*sa*/satrb->type = smptype();/**/
 	}	
 	// TODO:: copiar variaveis declaradas em 'argdef' para os parametros da subrotina
-	symtab_asgm_params(symtab_first_entry, symtab_next_entry, &satrb->param);
+	symtab_asgm_params(symtab_first_entry, symtab_next_entry, satrb);
 	/*satrb->param = malloc((symtab_next_entry - symtab_first_entry) *  sizeof(SEMANTIC_ATTRIB));
 	int i;
 	for(i = symtab_first_entry, satrb->attributes = 0; i < symtab_next_entry; i++, satrb->attributes++) {
@@ -172,7 +171,7 @@ void argspc(void)
 	idlist();
 	match(':');
 	type = smptype();
-	/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
+	/*sa*/symtab_add_list(id_count, id_list, type, scope, 0, malloc(sizeof(int)*MAX_IND_SIZE));/**/
 }
 /*
 * idlist -> ID { ',' ID }
@@ -198,20 +197,19 @@ void typespec(SEMANTIC_ATTRIB *satrb)
 {
 	debug("typespec\n");
 	/*sa*/satrb->indirections = 0;/**/
+	/*sa*/satrb->type = 0;/**/ // CUIDADO CONFUNDIR COM PROCEDURE!!!
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
 		/*sa*/satrb->dimension[satrb->indirections++] = atoi(lexeme);/**/
-		/*sa*/satrb->type = 0;/**/ // CUIDADO CONFUNDIR COM PROCEDURE!!!
 		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
 		match(']');
 		match(OF);
 		goto q0;
 	}
 	else {
-		satrb->type = smptype();
-		/*sa*/satrb->indirections = 0;/**/
+		/*sa*/satrb->type = smptype();/**/
 	}
 }
 /*

@@ -27,7 +27,7 @@ enum natures {
 };
 
 #define   		MAX_ID_SIZE              		32	// Tamanho máximo dos identificadores
-#define			MAX_IND_SIZE						 1 // número máximo de indireções
+#define			MAX_IND_SIZE					0x100 // número máximo de indireções
 #define			MAX_ARGS_SIZE					0x100 // número máximo de argumentos
 
 #define   		MAX_INT_DIG             		10	// Número máximo de dígitos de um inteiro
