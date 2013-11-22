@@ -52,6 +52,7 @@ void tests(void)
     
   // necessário limpar o buffer do glob "glob_data"
   globfree(&glob_data);
+  symtab_lookup("");
 
 	// cálculo dos totais
   fprintf(object, "Total: %d\n", total);

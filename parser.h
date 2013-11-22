@@ -40,7 +40,7 @@ int smptype(void);
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
-void sbrhead(void);
+SEMANTIC_ATTRIB sbrhead(void);
 /*
  * argdef -> [ '(' arglist ')' ]
  */

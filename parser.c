@@ -21,7 +21,7 @@ void mypas(void)
 	match(PROGRAM);
 	match(ID);
 	match(';');
-	/*sa*/ scope = GLOBAL;/**/
+	/*sa*/scope = GLOBAL;/**/
 q0:
 	if(lookahead != BEGIN) {
 		specification();
@@ -71,9 +71,10 @@ q0:
 void sbrdeclr(void)	
 {
 	debug("sbrdeclr\n");
-	sbrhead();
-	/*sa*/scope = LOCAL;	
+	// troca o escopo para LOCAL para as declarações de argumentos e variaveis da subrotina
+	/*sa*/scope = LOCAL;/**/	
 	/**/int symtab_first_entry = symtab_next_entry;/**/
+	/*sa*/SEMANTIC_ATTRIB subroutine = sbrhead();/**/
 q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
@@ -81,35 +82,51 @@ q0:
 	}
 	stmblk();
 	match(';');
-	/*sa*/scope = GLOBAL;/**/
-	/**/symtab_next_entry = symtab_first_entry;/**/
+	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
+	/*sa*/subroutine.scope = scope;/**/
+	// TODO: limpar symtab para não ter problemas futuramente com lixo
+	/**/symtab_next_entry = symtab_first_entry;/**/ // apaga todas as declarações locais
+	
+	// adiciona a subrotina a tabela de simoblos
+	// TODO: precisa verificar se já existe
+	symtab[symtab_next_entry++] = subroutine;
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
-void sbrhead(void)
+SEMANTIC_ATTRIB sbrhead(void)
 {
 	debug("sbrhead\n");
-	/*sa*/int type;/**/
-	/*sa*/char *templexeme;/**/
+	/*sa*/SEMANTIC_ATTRIB subroutine;/**/ // lexema da subrotina
+	/*sa*/int symtab_first_entry = symtab_next_entry;/**/
+	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
-		/*sa*/strcpy(templexeme, lexeme);/**/
+		/*sa*/strcpy(subroutine.name, lexeme);/**/ // salva o lexema da subrotina
 		match(ID);
 		argdef();
-		/*sa*/type = 0;/**/
+		/*sa*/subroutine.type = 0;/**/
 	} else {
 		match(FUNCTION);
-		/*sa*/strcpy(templexeme, lexeme);/**/
+		/*sa*/strcpy(subroutine.name, lexeme);/**/ // salva o lexema da subrotina
 		match(ID);
 		argdef();
 		match(':');
-		/*sa*/type = smptype();/**/
+		/*sa*/subroutine.type = smptype();/**/
+	}	
+	// TODO:: copiar variaveis declaradas em 'argdef' para os parametros da subrotina
+	subroutine.param = malloc((symtab_next_entry - symtab_first_entry) *  sizeof(SEMANTIC_ATTRIB));
+	int i;
+	for(i = symtab_first_entry, subroutine.attributes = 0; i < symtab_next_entry; i++, subroutine.attributes++) {
+		strcpy(subroutine.param[subroutine.attributes].name, symtab[i].name);		
+		subroutine.param[subroutine.attributes].scope = symtab[i].scope;
+		subroutine.param[subroutine.attributes].type = symtab[i].type;		
+		subroutine.param[subroutine.attributes].offset = symtab[i].offset;
+		// ...
 	}
-	/*sa*/id_count = 0;/**/
-	/*sa*/strcpy(id_list[id_count++], templexeme);/**/
-	/*sa*/symtab_add_list(id_count, id_list, type, scope);/**/
+	subroutine.indirections = 0;
 	match(';');
+	return subroutine;
 }
 /*
  * argdef -> [ '(' arglist ')' ]

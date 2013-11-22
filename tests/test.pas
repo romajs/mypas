@@ -5,6 +5,7 @@ VAR
   valor, custo: Real;
   qtde: Double;
   ativo: Boolean;
+  alai: Array[3] of array [4] of integer;
 VAR
 	matrix: Array[3] of array [4] of integer;
 { Função que imprime "Hello" na saída }
@@ -53,7 +54,7 @@ BEGIN
   FOR i := 0 TO 10 DO
     WriteLn(arr[i]);
 END;
-PROCEDURE testerelop(z, y: Integer; s: String);
+PROCEDURE testerelop(x, y: Integer; s: String);
 BEGIN
   IF (z > y) THEN
 		s := 'ok'

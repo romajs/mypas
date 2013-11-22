@@ -3,19 +3,22 @@
 
 #include <tokens.h>
 
-struct _semantic_attrib_ {
+typedef struct _semantic_atrib_ {
 	char name[MAX_ID_SIZE];
 	int scope;
-	int offset;
 	int type;
+	int offset;
+	
 	//int offsettype; ???
-	int indirections;
 	//int objtype; ???
-	int dimension[MAX_IND_SIZE];
-	//SEMANTIC_ATTRIB argattrb[MAX_ARGS_SIZE];
-};
-
-typedef struct _semantic_attrib_ SEMANTIC_ATTRIB;
+		
+	int dimension[MAX_IND_SIZE]; 
+	int indirections; // quantidade de indireções da lista de dimensões
+	
+	struct _semantic_atrib_ *param;
+	int attributes; // quantidade de atributos na lista de parametros
+	
+} SEMANTIC_ATTRIB;
 
 extern SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 
