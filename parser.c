@@ -453,14 +453,19 @@ void expr(void)
 
 	F: debug("F: %d\n", ++F_lvl); 	
 
+	/*sa*/char *id_lexeme;/**/
 	switch(lookahead) {
     case ID:
+		/*sa*/strcpy(id_lexeme, lexeme);/**/
       match(ID);
 		if(lookahead == '(') {
 			param();
 		} 
 		/**OBS: indexing é opcional**/
 		indexing();
+		/*sa*/if(!symtab_lookup(id_lexeme)) {
+			err(FATAL, SEMANTIC, "%s was not declared.\n", id_lexeme);
+		}/**/
       break;
     /**************************************************************************
     *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
