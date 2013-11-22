@@ -61,7 +61,7 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 		symtab[symtab_next_entry].scope = scope;
 		symtab[symtab_next_entry].attributes = 0;
 		symtab[symtab_next_entry].indirections = indirections;
-		memcpy(symtab[symtab_next_entry].dimension, dimension, sizeof(dimension));
+		memcpy(symtab[symtab_next_entry].dimension, dimension, sizeof(int) * MAX_IND_SIZE);
 		debug("added to symtab[%d]: { name = %s, scope = %d, type = %d, ind = %d, attr = %d }\n",
 			symtab_next_entry, symtab[symtab_next_entry].name, symtab[symtab_next_entry].scope,
 			symtab[symtab_next_entry].type, symtab[symtab_next_entry].indirections, symtab[symtab_next_entry].attributes);

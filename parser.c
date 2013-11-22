@@ -60,6 +60,7 @@ void vardeclr(void)
 	match(VAR);
 q0:
 	/*sa*/satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
+	/*sa*/satrb->scope = scope;/**/
 	if(lookahead == ID) {
 		idlist();
 		match(':');
@@ -201,7 +202,7 @@ void typespec(SEMANTIC_ATTRIB *satrb)
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
-		match('[');
+		match('[');		
 		/*sa*/satrb->dimension[satrb->indirections++] = atoi(lexeme);/**/
 		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
 		match(']');

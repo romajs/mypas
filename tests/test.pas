@@ -5,7 +5,7 @@ VAR
   valor, custo: Real;
   qtde: Double;
   ativo: Boolean;
-  alai: Array[3] of array [4] of integer;
+  alai: Array[3] of integer;
 VAR
 	matrix: Array[3] of array [4] of integer;
 { Função que imprime "Hello" na saída }
