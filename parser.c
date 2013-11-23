@@ -109,7 +109,7 @@ void sbrhead()
 	/* it will never have indirections */symtab[entry].indirections = 0;
   
 	/* change current scope to LOCAL */scope = LOCAL;  
-	/* store subroutine declaraions */int symtab_first_entry = symtab_next_entry;
+	/* store subroutine declarations */int symtab_first_entry;
   
   /* REMINDER: the subroutine itself needs to become declared (stored in symtab) 
     before 'stmblk' because it might have recursion calls in the subroutine. The
@@ -125,6 +125,7 @@ void sbrhead()
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry);
 		match(ID);    
+    /* store begin of parameter declarations */symtab_first_entry = symtab_next_entry;
 		argdef();
 		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
@@ -144,6 +145,7 @@ void sbrhead()
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry_var);
 		match(ID);    
+    /* store begin of parameter declarations */symtab_first_entry = symtab_next_entry;
 		argdef();
 		match(':');
 		/* set subroutine type */symtab[entry].type = smptype();
@@ -401,7 +403,7 @@ void idstmt(void)
  */
 indexing(int indexlevel)
 {
-	debug("indexing\n");
+	debug("<indexing>\n");
   /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
     overload indirections entrie, but it can become lower */
 q0:
@@ -411,10 +413,12 @@ q0:
     expr();
     match(']');
     goto q0;
-  }
+  }  
+  debug("\tindexlevel = %d\n", indexlevel);
   if(indexlevel < 0) {
     err(FATAL, SEMANTIC, "Too many index levels.\n");
   }
+  debug("</indexing>\n");
   return indexlevel >= 0;
 }
 /*
@@ -423,39 +427,45 @@ q0:
 /**OBS: exprlst é opcional**/
 param(int paramindex)
 {
-  int result = 0;
-	debug("param\n");
+	debug("<param>\n");
+  /* REMINDER: paramindex must match attributes entries */
 	if(lookahead == '(') {
 		match('(');
 		if(lookahead == ')') {
 			match(')');
 		} else {
-			result = exprlst(paramindex);
+			paramindex = exprlst(paramindex);
 			match(')');
 		}
 	}
-  return result;
+  /* REMINDER: paramindex must be treated here and not in 'exprlst', because it
+    may have none */    
+  debug("\tparamindex = %d\n", paramindex);
+  if(paramindex < 0) {
+    err(FATAL, SEMANTIC, "Too many arguments.\n");
+  } else if(paramindex > 0) {
+    err(FATAL, SEMANTIC, "Too few arguments.\n");
+  }
+  debug("</param>\n");
+  return paramindex == 0;
 }
 /*
  * exprlst -> expr { ',' expr }
  */
-int  exprlst(int paramindex)
+int exprlst(int paramindex)
 {
 	debug("exprlst\n");
-  /* REMINDER: paramindex must match attributes entrie */
+   /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
+    overload indirections entrie, but it can become lower */
 q0:
 	expr();
+  paramindex--;
+  debug("\tparamindex = %d\n", paramindex);
 	if(lookahead == ',') {
-    paramindex--;
 		match(',');
 		goto q0;
 	}
-  if(paramindex < 0) {
-    err(FATAL, SEMANTIC, "Too many parameters.\n");
-  } else if(paramindex > 0) {
-    err(FATAL, SEMANTIC, "Too few parameters.\n");
-  }
-  return paramindex == 0;
+  return paramindex;
 }
 /******************************************************************************
 *** Algebric and Boolean Expressions are defined hereafter: *******************
@@ -502,7 +512,11 @@ void expr(void)
       /* search for id in symtab */if(!(entry = symtab_lookup(lexeme))) {
         err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
       }
+      debug_symtab_entry(entry);
       match(ID);
+      
+      // TODO: validate recusion calls from subroutines
+      
       if(lookahead == '(') {
         /* match entry attributes */param(symtab[entry].attributes);
       } 

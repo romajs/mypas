@@ -14,10 +14,12 @@ symtab_lookup(const char *query)
 	int i;
 	for(i = symtab_next_entry - 1; i > 0; i--){
 		debug_symtab_entry(i);		
-		if(strcmp(symtab[i].name, query) == 0) {
+		if(strcmp(symtab[i].name, query) == 0) {      
+      debug("%s founded in symtab at position %d.\n", query, i);
 			return i;
 		}
 	}
+  debug("%s not found.\n", query);
 	return 0;
 }
 
