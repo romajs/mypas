@@ -327,8 +327,12 @@ void forstmt(void)
 {
 	debug("forstmt\n");
 	match(FOR);
+  int entry = symtab_lookup(lexeme);
+  if(!entry) {
+    err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
+  }
 	match(ID);
-	indexing();
+	indexing(symtab[entry].indirections);
 	match(ATTR); // ':='
 	expr();
 	if(lookahead == TO) {
@@ -358,11 +362,15 @@ void repstmt(void)
 void idstmt(void)
 {
 	debug("idstmt\n");
+  int entry = symtab_lookup(lexeme);
+  if(!entry) {
+    err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
+  }
 	match(ID);
 	if(lookahead == '(') {
-		param();
+		param(symtab[entry].attributes);
 	} else {
-		indexing();
+		indexing(symtab[entry].indirections);
 		if(lookahead == ATTR) {
 			match(ATTR); // ATTR = ':='
 			expr();
@@ -372,46 +380,63 @@ void idstmt(void)
 /*
  * indexing -> {  '[' expr ']' }
  */
-void indexing(void)
+indexing(int indexlevel)
 {
 	debug("indexing\n");
+  /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
+    overload indirections entrie, but it can become lower */
 q0:
   if(lookahead == '[') {
-	 match('[');
-	 expr();
-	 match(']');
-	 goto q0;
+    indexlevel--;
+    match('[');
+    expr();
+    match(']');
+    goto q0;
   }
+  if(indexlevel < 0) {
+    err(FATAL, SEMANTIC, "Too many index levels.\n");
+  }
+  return indexlevel >= 0;
 }
 /*
  * parm -> '(' [ ')' | exprlst ')']
  */
 /**OBS: exprlst é opcional**/
-void param(void)
+param(int paramindex)
 {
+  int result = 0;
 	debug("param\n");
 	if(lookahead == '(') {
 		match('(');
 		if(lookahead == ')') {
 			match(')');
 		} else {
-			exprlst();
+			result = exprlst(paramindex);
 			match(')');
 		}
 	}
+  return result;
 }
 /*
  * exprlst -> expr { ',' expr }
  */
-void exprlst(void)
+int  exprlst(int paramindex)
 {
 	debug("exprlst\n");
+  /* REMINDER: paramindex must match attributes entrie */
 q0:
 	expr();
 	if(lookahead == ',') {
+    paramindex--;
 		match(',');
 		goto q0;
 	}
+  if(paramindex < 0) {
+    err(FATAL, SEMANTIC, "Too many parameters.\n");
+  } else if(paramindex > 0) {
+    err(FATAL, SEMANTIC, "Too few parameters.\n");
+  }
+  return paramindex == 0;
 }
 /******************************************************************************
 *** Algebric and Boolean Expressions are defined hereafter: *******************
@@ -452,21 +477,18 @@ void expr(void)
 
 	F: debug("F: %d\n", ++F_lvl); 	
 
-	/* store id lexeme */char *id_lexeme;
+  /* id symtab position */int entry;
 	switch(lookahead) {
     case ID:
-      /* saves id lexeme */strcpy(id_lexeme, lexeme);
-      /* search for id in symtab */if(!symtab_lookup(id_lexeme)) {
-        err(FATAL, SEMANTIC, "%s was not declared.\n", id_lexeme);
+      /* search for id in symtab */if(!(entry = symtab_lookup(lexeme))) {
+        err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
       }
       match(ID);
       if(lookahead == '(') {
-        param();
+        /* match entry attributes */param(symtab[entry].attributes);
       } 
-      // TODO: match param list
       /**OBS: indexing é opcional**/
-      indexing();		
-      // TODO: match dimensions < =
+      /* match entry indirections */indexing(symtab[entry].indirections);		
       break;
     /**************************************************************************
     *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **

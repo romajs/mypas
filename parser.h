@@ -91,15 +91,15 @@ void idstmt(void);
 /*
  * indexing -> {  '[' expr ']' }
  */
-void indexing(void);
+int indexing(int);
 /*
  * parm -> '(' [ ')' | exprlst ')']
  */
-void param(void);
+int param(int);
 /*
  * exprlst -> expr { ',' expr }
  */
-void exprlst(void);
+int exprlst(int);
 
 /******************************************************************************
 *** Algebric and Boolean Expressions are defined hereafter: *******************
