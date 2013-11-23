@@ -10,7 +10,7 @@ int symtab_next_entry = 1;
 
 symtab_lookup(const char *query)
 {
-	debug("<symtab_lookup, entries = %d>\n", symtab_next_entry);
+	debug("<symtab_lookup, entries = %d>\n", symtab_next_entry - 1);
 	int i;
 	for(i = symtab_next_entry - 1; i > 0; i--){
 		debug_symtab_entry(i);		

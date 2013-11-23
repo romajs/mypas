@@ -118,17 +118,36 @@ void sbrhead()
 	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
+    /* validate id subroutine */if(symtab_lookup(lexeme)) {      
+			err(FATAL, SEMANTIC, "%s already defined in current scope\n", lexeme);
+    }
 		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
+    debug("%s was added susessfully to symtab\n", symtab[entry].name);
+    debug_symtab_entry(entry);
 		match(ID);    
 		argdef();
 		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
 		match(FUNCTION);
-		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
-		match(ID);
+    /* validate id subroutine */if(symtab_lookup(lexeme)) {      
+			err(FATAL, SEMANTIC, "%s already defined in current scope\n", lexeme);
+    }
+		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);      
+    debug("%s was added susessfully to symtab\n", symtab[entry].name);
+    debug_symtab_entry(entry);
+    /* In case of FUNCTION, a variable with same name must be added to symtab
+      to be used internally in 'stmblk' to set the returng value from the
+      function, but the scope of this variavel need to become current scope */
+    /* saves one position in symtab */int entry_var = symtab_next_entry++;
+    symtab[entry_var] = symtab[entry];    
+    symtab[entry_var].scope = scope;    
+    debug("%s was added susessfully to symtab\n", symtab[entry].name);
+    debug_symtab_entry(entry_var);
+		match(ID);    
 		argdef();
 		match(':');
 		/* set subroutine type */symtab[entry].type = smptype();
+    /* set var type as the same */symtab[entry_var].type = symtab[entry].type;
 	}	
 	/* assign all parameters declared in 'argdef' to subroutine param list */
 	set_subroutine_param_list(symtab_first_entry, symtab_next_entry, entry);
