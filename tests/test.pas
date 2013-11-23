@@ -54,7 +54,7 @@ BEGIN
   FOR i := 0 TO 10 DO
     WriteLn(arr[i]);
 END;
-PROCEDURE testerelop(x, y: Integer; s: String);
+PROCEDURE testerelop(x: double; y, z: Integer; s: String);
 BEGIN
   IF (z > y) THEN
 		s := 'ok'

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <tokens.h>
+#include <symtab.h>
 
 void set_debug(int);
 

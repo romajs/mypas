@@ -28,8 +28,6 @@ int symtab_lookup(const char *);
 
 int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
 
-int symtab_add(SEMANTIC_ATTRIB*);
-
 extern FILE *source;
 
 extern FILE *object;

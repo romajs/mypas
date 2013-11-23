@@ -66,7 +66,8 @@ q0:
 		match(':');
 		/*sa*/typespec(satrb);/**/
 		match(';');
-		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope, satrb->indirections, satrb->dimension);/**/
+		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope,
+      satrb->indirections, satrb->dimension);/**/
 		goto q0;
 	}	
 	debug("</vardeclr>\n");
@@ -77,12 +78,9 @@ q0:
 void sbrdeclr(void)	
 {
 	debug("<sbrdeclr>\n");
-	// troca o escopo para LOCAL para as declarações de argumentos e variaveis da subrotina
-	/*sa*/scope = LOCAL;/**/	
-	/**/int symtab_first_entry = symtab_next_entry;/**/
-	/*sa*/SEMANTIC_ATTRIB *satrb = malloc(sizeof(SEMANTIC_ATTRIB));/**/
-	/*sa*/sbrhead(satrb);/**/
-	
+	/* store begin of subroutine declarations plus the declaration itself */
+  int symtab_first_entry = symtab_next_entry + 1;
+	sbrhead();	
 q0:
 	if(lookahead != BEGIN) {
 		vardeclr();
@@ -91,48 +89,49 @@ q0:
 	stmblk();
 	match(';');
 	
-	// TODO: apagar todas as declarações locais de 'symlist'
-	/**/symtab_next_entry = symtab_first_entry;/**/ 		
+	// TODO: limpar os valores das propriedades do array de symtab
+	/* reset symtab next entry, eliminating LOCAL declarations */
+  symtab_next_entry = symtab_first_entry;
 	
-	/*sa*/scope = GLOBAL;/**/ // volta escopo ao atual
+	/* volta escopo p/ global */scope = GLOBAL;
 	
-	// completa atributos de 'satrb'
-	/*sa*/satrb->scope = scope;/**/	
-	/*sa*/satrb->indirections = 0;/**/
-	
-	//  adiciona a subrotina a tabela de símbolos
-	symtab_add(satrb);
 	debug("</sbrdeclr>\n");
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
-void sbrhead(SEMANTIC_ATTRIB *satrb)
+void sbrhead()
 {
-	debug("sbrhead\n");
-	/*sa*/int symtab_first_entry = symtab_next_entry;/**/
+	debug("sbrhead\n");  
+	/* reserve one address to subroutine */int entry = symtab_next_entry++;
+  /* fill subroutine attributes */
+	/* set subroutine scope to GLOBAL */symtab[entry].scope = scope;
+	/* it will never have indirections */symtab[entry].indirections = 0;
+  
+	/* change current scope to LOCAL */scope = LOCAL;  
+	/* store subroutine declaraions */int symtab_first_entry = symtab_next_entry;
+  
+  /* REMINDER: the subroutine itself needs to become declared (stored in symtab) 
+    before 'stmblk' because it might have recursion calls in the subroutine. The
+    ideal should separate 'sbrdhead' from 'sbrbody' for example, but lexer/parser
+    is already defined */
 	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
-		/*sa*/strcpy(satrb->name, lexeme);/**/ // salva o lexema da subrotina
-		match(ID);
+		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
+		match(ID);    
 		argdef();
-		/*sa*/satrb->type = 0;/**/ // (SEM TIPO)
+		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
 		match(FUNCTION);
-		/*sa*/strcpy(satrb->name, lexeme);/**/ // salva o lexema da subrotina
+		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
 		match(ID);
 		argdef();
 		match(':');
-		/*sa*/satrb->type = smptype();/**/
+		/* set subroutine type */symtab[entry].type = smptype();
 	}	
-	// TODO:: copiar variaveis declaradas em 'argdef' para os parametros da subrotina
-	symtab_asgm_params(symtab_first_entry, symtab_next_entry, satrb);
-	/*satrb->param = malloc((symtab_next_entry - symtab_first_entry) *  sizeof(SEMANTIC_ATTRIB));
-	int i;
-	for(i = symtab_first_entry, satrb->attributes = 0; i < symtab_next_entry; i++, satrb->attributes++) {
-		memcpy(&satrb->param[satrb->attributes], &symtab[i], sizeof(SEMANTIC_ATTRIB));
-	}*/
+	/* assign all parameters declared in 'argdef' to subroutine param list */
+	set_subroutine_param_list(symtab_first_entry, symtab_next_entry, entry);
 	match(';');
 }
 /*
@@ -453,19 +452,21 @@ void expr(void)
 
 	F: debug("F: %d\n", ++F_lvl); 	
 
-	/*sa*/char *id_lexeme;/**/
+	/* store id lexeme */char *id_lexeme;
 	switch(lookahead) {
     case ID:
-		/*sa*/strcpy(id_lexeme, lexeme);/**/
+      /* saves id lexeme */strcpy(id_lexeme, lexeme);
+      /* search for id in symtab */if(!symtab_lookup(id_lexeme)) {
+        err(FATAL, SEMANTIC, "%s was not declared.\n", id_lexeme);
+      }
       match(ID);
-		if(lookahead == '(') {
-			param();
-		} 
-		/**OBS: indexing é opcional**/
-		indexing();
-		/*sa*/if(!symtab_lookup(id_lexeme)) {
-			err(FATAL, SEMANTIC, "%s was not declared.\n", id_lexeme);
-		}/**/
+      if(lookahead == '(') {
+        param();
+      } 
+      // TODO: match param list
+      /**OBS: indexing é opcional**/
+      indexing();		
+      // TODO: match dimensions < =
       break;
     /**************************************************************************
     *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **

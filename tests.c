@@ -13,6 +13,7 @@ test(const char* filename)
     fprintf(object, "Testing: \"%s\"\n", filename);
     source = fopen(filename, "r+");
     mypas();
+    debug_symtab();
     fclose(source);
   /*}
   else { // aguardo o término do filho
@@ -52,7 +53,6 @@ void tests(void)
     
   // necessário limpar o buffer do glob "glob_data"
   globfree(&glob_data);
-  symtab_lookup("");
 
 	// cálculo dos totais
   fprintf(object, "Total: %d\n", total);
