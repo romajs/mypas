@@ -380,8 +380,8 @@ void idstmt(void)
 	debug("idstmt\n");
   int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
-	if(lookahead == '(') {
-		param(symtab[entry].attributes);
+	if(lookahead == '(' || symtab[entry].attributes) {
+    /* match entry attributes */param(entry);
 	} else {
 		indexing(symtab[entry].indirections);
 		if(lookahead == ATTR) {
@@ -417,19 +417,20 @@ q0:
  * parm -> '(' [ ')' | exprlst ')']
  */
 /**OBS: exprlst é opcional**/
-param(int paramindex)
+param(int entry)
 {
 	debug("<param>\n");
-  /* REMINDER: paramindex must match attributes entries */
-	if(lookahead == '(') {
-		match('(');
-		if(lookahead == ')') {
-			match(')');
-		} else {
-			paramindex = exprlst(paramindex);
-			match(')');
-		}
-	}
+  /* start paramindex */ int paramindex = symtab[entry].attributes;
+  debug("symtab[%d].attributes = %d\n", entry, symtab[entry].attributes);
+  /* REMINDER: paramindex must match all attributes entries, in case if the
+    subroutine has no arguments then it may match '()' or not (optional) */
+  match('(');
+  if(lookahead == ')') {
+    match(')');
+  } else {
+    paramindex = exprlst(symtab[entry].attributes);
+    match(')');
+  }
   /* REMINDER: paramindex must be treated here and not in 'exprlst', because it
     may have none */    
   debug("\tparamindex = %d\n", paramindex);
@@ -504,9 +505,9 @@ void expr(void)
       /* search for id in symtab */entry = symtab_retrieve(lexeme, 1);
       debug_symtab_entry(entry);
       match(ID);      
-      if(lookahead == '(') {
-        /* match entry attributes */param(symtab[entry].attributes);
-      } 
+      if(lookahead == '(' || symtab[entry].attributes) {
+        /* match entry attributes */param(entry);
+      }
       /**OBS: indexing é opcional**/
       /* match entry indirections */indexing(symtab[entry].indirections);		
       break;

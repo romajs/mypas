@@ -34,6 +34,7 @@ symtab_retrieve(const char *query, int skipobj) {
   if(!entry) {
     err(FATAL, SEMANTIC, "%s was not declared.\n", query);
   }
+  return entry;
 }
 
 // verifica se uma variável não existe
@@ -42,6 +43,7 @@ symtab_validate(const char *query) {
   if(entry) {
     err(FATAL, SEMANTIC, "%s already defined in current scope\n", query);
   }
+  return entry;
 }
 
 // adiciona uma lista de variáveis a tabela de símbolos (batch)

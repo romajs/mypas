@@ -73,13 +73,16 @@ BEGIN
 		s := 'ok'		
   ELSE
 		s := 'not ok';
+  WriteLn(s);
 END;
 BEGIN
 	SayHello();
 	SayHello;
 	Fibonacci(5);
-	Fibonacci(6);
-	valor := qtde * custo;
-	{ testerelop(-1287930123.1234546789, 100.5626179281093e-308); { ashdgausgduasgdugbahisdas}
-  nome := 'abacaxi';
+  testerelop(1,2,3,'');
+  alai;
+  alai[3];
+  matrix;
+  matrix[0];
+  matrix[0][1];
 END.
