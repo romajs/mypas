@@ -8,7 +8,7 @@ SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 
 int symtab_next_entry = 1;
 
-// faz uma busca na tabela de simbolos
+// faz uma busca na tabela de simbolos e retorna sua posição
 symtab_lookup(const char *query, int skipobj)
 {
 	debug("<symtab_lookup, entries = %d>\n", symtab_next_entry - 1);
@@ -28,7 +28,7 @@ symtab_lookup(const char *query, int skipobj)
 	return 0;
 }
 
-// localiza na tabela de simbolos
+// retorna uma variável já declarada
 symtab_retrieve(const char *query, int skipobj) {
 	int entry = symtab_lookup(query, skipobj);
   if(!entry) {
@@ -36,7 +36,7 @@ symtab_retrieve(const char *query, int skipobj) {
   }
 }
 
-// localiza na tabela de simbolos
+// verifica se uma variável não existe
 symtab_validate(const char *query) {
 	int entry = symtab_lookup(query, 0);
   if(entry) {
@@ -44,6 +44,7 @@ symtab_validate(const char *query) {
   }
 }
 
+// adiciona uma lista de variáveis a tabela de símbolos (batch)
 symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int type, int scope,
 	int indirections, int dimension[MAX_IND_SIZE])
 {
@@ -65,7 +66,7 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 		strcpy(symtab[symtab_next_entry].name, symlist[i]);
 		symtab[symtab_next_entry].type = type;
 		symtab[symtab_next_entry].scope = scope;
-    if(symtab[symtab_next_entry].indirections) {
+    /* set objtype */if(symtab[symtab_next_entry].indirections) {
       symtab[symtab_next_entry].objtype = POINTER;
     } else {
       symtab[symtab_next_entry].objtype = ATOMIC;
