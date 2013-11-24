@@ -41,7 +41,7 @@ void debug_symtab_entry(int i)
 }
 
 void debug_symtab(void) {
-	debug("<debug_symtab: entries = %d>\n", symtab_next_entry - 1);
+	debug("<debug_symtab: entries = %d>\n", symtab_entry - 1);
   int i;
   for(i = symtab_entry - 1; i > 0; i--){
     debug_symtab_entry(i);

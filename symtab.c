@@ -18,7 +18,7 @@ symtab_next_entry() {
 }
 
 symtab_reset_entries(int to) {
-  //memset(symtab + to, 0, sizeof(SEMANTIC_ATTRIB));
+  memset(symtab + to, 0, sizeof(SEMANTIC_ATTRIB));
   symtab_entry = to;
 }
 
