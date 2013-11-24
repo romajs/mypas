@@ -20,8 +20,8 @@ void debug(const char *format, ...) {
 
 void debug_symtab_entry(int i)
 {
-  debug("symtab[%d]: { name = %s, scope = %d, type = %d", i, symtab[i].name,
-    symtab[i].scope, symtab[i].type);
+  debug("symtab[%d]: { name = %s, scope = %d, type = %d, objtype = %d", i, symtab[i].name,
+    symtab[i].scope, symtab[i].type, symtab[i].objtype);
   int j;
   if(symtab[i].indirections) {
     debug(", dimensions = %d ", symtab[i].indirections);
@@ -37,7 +37,7 @@ void debug_symtab_entry(int i)
         symtab[i].param[j].indirections);
     }      
   }
-  debug("} \n");
+  debug(" } \n");
 }
 
 void debug_symtab(void) {

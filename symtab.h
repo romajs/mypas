@@ -10,7 +10,7 @@ typedef struct _semantic_atrib_ {
 	int offset;
 	
 	//int offsettype; ???
-	//int objtype; ???
+	int objtype; // ATOMIC | SUBROUTINE | POINTER
 		
 	int dimension[MAX_IND_SIZE]; 
 	int indirections; // quantidade de indireções da lista de dimensões
@@ -24,7 +24,11 @@ extern SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 
 extern int symtab_next_entry;
 
-int symtab_lookup(const char *);
+int symtab_lookup(const char *, int);
+
+int symtab_retrieve(const char *, int);
+
+int symtab_validate(const char*);
 
 int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
 

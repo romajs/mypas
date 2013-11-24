@@ -106,6 +106,7 @@ void sbrhead()
 	/* reserve one address to subroutine */int entry = symtab_next_entry++;
   /* fill subroutine attributes */
 	/* set subroutine scope to GLOBAL */symtab[entry].scope = scope;
+  /* set object type to SUBROUTINE */symtab[entry].objtype = SUBROUTINE;
 	/* it will never have indirections */symtab[entry].indirections = 0;
   
 	/* change current scope to LOCAL */scope = LOCAL;  
@@ -118,9 +119,7 @@ void sbrhead()
 	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
-    /* validate id subroutine */if(symtab_lookup(lexeme)) {      
-			err(FATAL, SEMANTIC, "%s already defined in current scope\n", lexeme);
-    }
+    /* validate id subroutine */symtab_validate(lexeme);
 		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry);
@@ -130,9 +129,7 @@ void sbrhead()
 		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
 		match(FUNCTION);
-    /* validate id subroutine */if(symtab_lookup(lexeme)) {      
-			err(FATAL, SEMANTIC, "%s already defined in current scope\n", lexeme);
-    }
+    /* validate id subroutine */symtab_validate(lexeme);
 		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);      
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry);
@@ -141,7 +138,8 @@ void sbrhead()
       function, but the scope of this variavel need to become current scope */
     /* saves one position in symtab */int entry_var = symtab_next_entry++;
     symtab[entry_var] = symtab[entry];    
-    symtab[entry_var].scope = scope;    
+    symtab[entry_var].scope = scope;   
+    symtab[entry_var].objtype = 0;
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry_var);
 		match(ID);    
@@ -348,10 +346,7 @@ void forstmt(void)
 {
 	debug("forstmt\n");
 	match(FOR);
-  int entry = symtab_lookup(lexeme);
-  if(!entry) {
-    err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
-  }
+  int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
 	indexing(symtab[entry].indirections);
 	match(ATTR); // ':='
@@ -383,10 +378,7 @@ void repstmt(void)
 void idstmt(void)
 {
 	debug("idstmt\n");
-  int entry = symtab_lookup(lexeme);
-  if(!entry) {
-    err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
-  }
+  int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
 	if(lookahead == '(') {
 		param(symtab[entry].attributes);
@@ -509,14 +501,9 @@ void expr(void)
   /* id symtab position */int entry;
 	switch(lookahead) {
     case ID:
-      /* search for id in symtab */if(!(entry = symtab_lookup(lexeme))) {
-        err(FATAL, SEMANTIC, "%s was not declared.\n", lexeme);
-      }
+      /* search for id in symtab */entry = symtab_retrieve(lexeme, 1);
       debug_symtab_entry(entry);
-      match(ID);
-      
-      // TODO: validate recusion calls from subroutines
-      
+      match(ID);      
       if(lookahead == '(') {
         /* match entry attributes */param(symtab[entry].attributes);
       } 

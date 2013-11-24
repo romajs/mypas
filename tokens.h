@@ -1,6 +1,13 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
+// object types
+enum {
+  ATOMIC = 1, // INTEGER, REAL, STRING, ...
+  POINTER, // ARRAY
+  SUBROUTINE, // PROCEDURE, FUNCTION
+};
+
 // semantic types for expressions
 enum {
 	ID = 1025,

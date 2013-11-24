@@ -1,13 +1,16 @@
 PROGRAM test101;
 VAR
   id: Integer;
-  produto: String;
+  produto, nome: String;
   valor, custo: Real;
   qtde: Double;
   ativo: Boolean;
   alai: Array[3] of integer;
 VAR
 	matrix: Array[3] of array [4] of integer;
+PROCEDURE WriteLn(format: String);
+BEGIN
+END;  
 { Função que imprime "Hello" na saída }
 PROCEDURE SayHello;
 var
@@ -20,9 +23,9 @@ END;
 FUNCTION Fibonacci(x: Integer): Integer;
 BEGIN
   IF (x = 0) or (x = 1) THEN
-    result := x
+    Fibonacci := x
   ELSE
-    result := Fibonacci(x - 2) + Fibonacci(x - 1);
+    Fibonacci := Fibonacci(x - 2) + Fibonacci(x - 1);
 END;
 { Função de Fatorial }
 FUNCTION Fatorial(i: Integer): Integer;
@@ -35,7 +38,7 @@ BEGIN
 		x := x * i;
 		i := i - 1;
 	END;	
-	result := x;
+	Fatorial := x;
 END;	
 { Loop infinito }
 PROCEDURE Infinito;
@@ -77,6 +80,6 @@ BEGIN
 	Fibonacci(5);
 	Fibonacci(6);
 	valor := qtde * custo;
-	testerelop(-1287930123.1234546789, 100.5626179281093e-308); { ashdgausgduasgdugbahisdas}
-	nome := 'abacaxi';
+	{ testerelop(-1287930123.1234546789, 100.5626179281093e-308); { ashdgausgduasgdugbahisdas}
+  nome := 'abacaxi';
 END.

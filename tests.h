@@ -10,5 +10,3 @@ extern int error;
 int test(const char*);
 
 void tests(void);
-
-extern int symtab_lookup(const char *);
