@@ -79,7 +79,7 @@ void sbrdeclr(void)
 {
 	debug("<sbrdeclr>\n");
 	/* store begin of subroutine declarations plus the declaration itself */
-  int symtab_first_entry = symtab_next_entry + 1;
+  int symtab_first_entry = symtab_entry + 1;
 	sbrhead();	
 q0:
 	if(lookahead != BEGIN) {
@@ -89,9 +89,8 @@ q0:
 	stmblk();
 	match(';');
 	
-	// TODO: limpar os valores das propriedades do array de symtab
-	/* reset symtab next entry, eliminating LOCAL declarations */
-  symtab_next_entry = symtab_first_entry;
+	/* reset symtab entries, eliminating LOCAL declarations */
+  symtab_reset_entries(symtab_first_entry);
 	
 	/* volta escopo p/ global */scope = GLOBAL;
 	
@@ -103,7 +102,7 @@ q0:
 void sbrhead()
 {
 	debug("sbrhead\n");  
-	/* reserve one address to subroutine */int entry = symtab_next_entry++;
+	/* reserve one address to subroutine */int entry = symtab_next_entry();
   /* fill subroutine attributes */
 	/* set subroutine scope to GLOBAL */symtab[entry].scope = scope;
   /* set object type to SUBROUTINE */symtab[entry].objtype = SUBROUTINE;
@@ -124,7 +123,7 @@ void sbrhead()
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry);
 		match(ID);    
-    /* store begin of arg declarations */symtab_first_entry = symtab_next_entry;
+    /* store begin of arg declarations */symtab_first_entry = symtab_entry;
 		argdef();
 		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
@@ -136,21 +135,21 @@ void sbrhead()
     /* In case of FUNCTION, a variable with same name must be added to symtab
       to be used internally in 'stmblk' to set the returng value from the
       function, but the scope of this variavel need to become current scope */
-    /* saves one position in symtab */int entry_var = symtab_next_entry++;
+    /* saves one position in symtab */int entry_var = symtab_next_entry();
     symtab[entry_var] = symtab[entry];    
     symtab[entry_var].scope = scope;   
     symtab[entry_var].objtype = 0;
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry_var);
 		match(ID);    
-    /* store begin of arg declarations */symtab_first_entry = symtab_next_entry;
+    /* store begin of arg declarations */symtab_first_entry = symtab_entry;
 		argdef();
 		match(':');
 		/* set subroutine type */symtab[entry].type = smptype();
     /* set var type as the same */symtab[entry_var].type = symtab[entry].type;
 	}	
 	/* assign all arguments declared in 'argdef' to subroutine */
-	set_subroutine_argument_list(symtab_first_entry, symtab_next_entry, entry);
+	set_subroutine_argument_list(symtab_first_entry, symtab_entry, entry);
 	match(';');
 }
 /*

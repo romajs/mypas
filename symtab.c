@@ -6,14 +6,30 @@
 
 SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 
-int symtab_next_entry = 1;
+int symtab_entry = 1;
 
-// faz uma busca na tabela de simbolos e retorna sua posição
+/* valida a próxima entrada a symtab, verificando a quantiddade já definida */
+symtab_next_entry() {
+  if(symtab_entry > MAX_SYMTAB_ENTRIES) {
+    err(FATAL, OTHER, "Max variable declaration rechead.\n");
+    return 0;
+  } 
+  return symtab_entry++;
+}
+
+symtab_reset_entries(int to) {
+  //memset(symtab + to, 0, sizeof(SEMANTIC_ATTRIB));
+  symtab_entry = to;
+}
+
+/* faz uma busca na tabela de simbolos e retorna sua posição, caso "skipobj"
+ seja true, a verificação irá pular os registros sem "objtype" definidos
+ caso das variáveis referentes a manipulação do valor de retorno da função */
 symtab_lookup(const char *query, int skipobj)
 {
-	debug("<symtab_lookup, entries = %d>\n", symtab_next_entry - 1);
+	debug("<symtab_lookup, entries = %d>\n", symtab_entry - 1);
 	int i;
-	for(i = symtab_next_entry - 1; i > 0; i--){
+	for(i = symtab_entry - 1; i > 0; i--){
 		debug_symtab_entry(i);		
     if(skipobj && !symtab[i].objtype) {
       debug("null objtype, skiping...");
@@ -28,7 +44,7 @@ symtab_lookup(const char *query, int skipobj)
 	return 0;
 }
 
-// retorna uma variável já declarada
+/* retorna uma variável já declarada */
 symtab_retrieve(const char *query, int skipobj) {
 	int entry = symtab_lookup(query, skipobj);
   if(!entry) {
@@ -37,7 +53,7 @@ symtab_retrieve(const char *query, int skipobj) {
   return entry;
 }
 
-// verifica se uma variável não existe
+/* verifica se uma variável não existe */
 symtab_validate(const char *query) {
 	int entry = symtab_lookup(query, 0);
   if(entry) {
@@ -46,9 +62,9 @@ symtab_validate(const char *query) {
   return entry;
 }
 
-// adiciona uma lista de variáveis a tabela de símbolos (batch)
-symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int type, int scope,
-	int indirections, int dimension[MAX_IND_SIZE])
+/* adiciona uma lista de variáveis a tabela de símbolos (batch) */
+symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1],
+  int type, int scope, int indirections, int dimension[MAX_IND_SIZE])
 {
 	debug("<symtab_add_list>\n");
 	debug("n: %d\n", n);
@@ -58,34 +74,29 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 	for(i = 0; i < n; i++){
 		debug("i: %d\n", i);
 		debug("symlist[%d] = %s\n", i, symlist[i]);
-		/* search for similiar entries */int entry = symtab_lookup(symlist[i], 0); 
-		debug("entry: %d\n", entry);		    
-		/* if there is any, goto error */if(entry && symtab[entry].scope >= scope){ 
-			err(FATAL, SEMANTIC, "%s already defined in current scope\n", symlist[i]);
-			return -1;
-		}
+    int entry = symtab_validate(symlist[i]);
+    entry = symtab_next_entry();   
     /* set all struct atributes */
-		strcpy(symtab[symtab_next_entry].name, symlist[i]);
-		symtab[symtab_next_entry].type = type;
-		symtab[symtab_next_entry].scope = scope;
-    /* set objtype */if(symtab[symtab_next_entry].indirections) {
-      symtab[symtab_next_entry].objtype = POINTER;
+		strcpy(symtab[entry].name, symlist[i]);
+		symtab[entry].type = type;
+		symtab[entry].scope = scope;
+    /* set objtype */if(symtab[entry].indirections) {
+      symtab[entry].objtype = POINTER;
     } else {
-      symtab[symtab_next_entry].objtype = ATOMIC;
+      symtab[entry].objtype = ATOMIC;
     }    
-		symtab[symtab_next_entry].attributes = 0;
-		symtab[symtab_next_entry].indirections = indirections;
-		memcpy(symtab[symtab_next_entry].dimension, dimension, sizeof(int) * MAX_IND_SIZE);
+		symtab[entry].attributes = 0;
+		symtab[entry].indirections = indirections;
+		memcpy(symtab[entry].dimension, dimension, sizeof(int) * MAX_IND_SIZE);
 		debug("%s was added susessfully to symtab\n", symlist[i]);
-		debug_symtab_entry(symtab_next_entry);
-		symtab_next_entry++;
+		debug_symtab_entry(entry);
 	}
   debug("</symtab_add_list>\n");
-	return symtab_next_entry;
+	return symtab_entry;
 }
 
-// cadastra uma lista de variáveis (já declaradas em symtab) como argumentos
-// de uma determinada subrotina (pos)
+/* cadastra uma lista de variáveis (já declaradas em symtab) como argumentos
+ de uma determinada subrotina (pos) */
 void set_subroutine_argument_list(int from, int to, int pos) {
 	debug("<set_subroutine_argument_list>\n");
 	symtab[pos].argument = malloc((to - from) * sizeof(SEMANTIC_ATTRIB));

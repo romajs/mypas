@@ -22,7 +22,11 @@ typedef struct _semantic_atrib_ {
 
 extern SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 
-extern int symtab_next_entry;
+extern int symtab_entry;
+
+int symtab_reset_entries(int);
+
+int symtab_next_entry();
 
 int symtab_lookup(const char *, int);
 
