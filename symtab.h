@@ -15,8 +15,8 @@ typedef struct _semantic_atrib_ {
 	int dimension[MAX_IND_SIZE]; 
 	int indirections; // quantidade de indireções da lista de dimensões
 	
-	struct _semantic_atrib_ *param;
-	int attributes; // quantidade de atributos na lista de parametros
+	struct _semantic_atrib_ *argument;
+	int attributes; // quantidade de atributos na lista de argumentos
 	
 } SEMANTIC_ATTRIB;
 
@@ -31,6 +31,8 @@ int symtab_retrieve(const char *, int);
 int symtab_validate(const char*);
 
 int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
+
+void set_subroutine_argument_list(int, int, int);
 
 extern FILE *source;
 

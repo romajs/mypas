@@ -124,7 +124,7 @@ void sbrhead()
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry);
 		match(ID);    
-    /* store begin of parameter declarations */symtab_first_entry = symtab_next_entry;
+    /* store begin of arg declarations */symtab_first_entry = symtab_next_entry;
 		argdef();
 		/* procedure has no type (0) */symtab[entry].type = 0;
 	} else {
@@ -143,14 +143,14 @@ void sbrhead()
     debug("%s was added susessfully to symtab\n", symtab[entry].name);
     debug_symtab_entry(entry_var);
 		match(ID);    
-    /* store begin of parameter declarations */symtab_first_entry = symtab_next_entry;
+    /* store begin of arg declarations */symtab_first_entry = symtab_next_entry;
 		argdef();
 		match(':');
 		/* set subroutine type */symtab[entry].type = smptype();
     /* set var type as the same */symtab[entry_var].type = symtab[entry].type;
 	}	
-	/* assign all parameters declared in 'argdef' to subroutine param list */
-	set_subroutine_param_list(symtab_first_entry, symtab_next_entry, entry);
+	/* assign all arguments declared in 'argdef' to subroutine */
+	set_subroutine_argument_list(symtab_first_entry, symtab_next_entry, entry);
 	match(';');
 }
 /*
@@ -434,9 +434,9 @@ param(int paramindex)
     may have none */    
   debug("\tparamindex = %d\n", paramindex);
   if(paramindex < 0) {
-    err(FATAL, SEMANTIC, "Too many arguments.\n");
+    err(FATAL, SEMANTIC, "Too many parameters.\n");
   } else if(paramindex > 0) {
-    err(FATAL, SEMANTIC, "Too few arguments.\n");
+    err(FATAL, SEMANTIC, "Too few parameters.\n");
   }
   debug("</param>\n");
   return paramindex == 0;

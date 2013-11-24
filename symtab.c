@@ -82,12 +82,19 @@ symtab_add_list(int n, char symlist[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int ty
 	return symtab_next_entry;
 }
 
-void set_subroutine_param_list(int from, int to, int pos) {
-	debug("<symtab_asgm_params>\n");
-	symtab[pos].param = malloc((to - from) * sizeof(SEMANTIC_ATTRIB));
-	int i;
-	for(i = from, symtab[pos].attributes = 0; i < to; i++, symtab[pos].attributes++) {
-		memcpy(&symtab[pos].param[symtab[pos].attributes], &symtab[i], sizeof(SEMANTIC_ATTRIB));
+// cadastra uma lista de variáveis (já declaradas em symtab) como argumentos
+// de uma determinada subrotina (pos)
+void set_subroutine_argument_list(int from, int to, int pos) {
+	debug("<set_subroutine_argument_list>\n");
+	symtab[pos].argument = malloc((to - from) * sizeof(SEMANTIC_ATTRIB));
+	symtab[pos].attributes = 0;
+  int i;
+	for(i = from; i < to; i++) {
+    debug("adding argument to %s[%d]: ", symtab[pos].name,
+      symtab[pos].attributes);
+    debug_symtab_entry(i);
+		memcpy(&symtab[pos].argument[symtab[pos].attributes++], &symtab[i],
+      sizeof(SEMANTIC_ATTRIB));
 	}
-  debug("</symtab_asgm_params>\n");
+  debug("</set_subroutine_argument_list>\n");
 }

@@ -30,11 +30,11 @@ void debug_symtab_entry(int i)
     }
   }
   if(symtab[i].attributes) {
-    debug(", params = %d }", symtab[i].attributes);
+    debug(", arguments = %d }", symtab[i].attributes);
     for(j = 0; j < symtab[i].attributes; j++) {
       debug("\n\t[%d]: { name = %s, scope = %d, type = %d, ind = %d }",
-        j, symtab[i].param[j].name, symtab[i].param[j].scope, symtab[i].param[j].type,
-        symtab[i].param[j].indirections);
+        j, symtab[i].argument[j].name, symtab[i].argument[j].scope,
+        symtab[i].argument[j].type, symtab[i].argument[j].indirections);
     }      
   }
   debug(" } \n");
