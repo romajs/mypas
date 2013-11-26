@@ -117,10 +117,8 @@ q0:
 	}
 }
 /*
- * argspc -> [ VAR ] idlist ':' smptype { idlist ':' smptype }
+ * argspc -> [ VAR ] idlist ':' smptype 
  */
-/** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
-	de uma declaração por VAR **/
 void argspc(void)
 {
 	debug("argspc\n");
