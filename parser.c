@@ -396,7 +396,7 @@ indexing(int indexlevel)
 {
 	debug("<indexing>\n");
   /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
-    overload indirections entrie, but it can become lower */
+    overload indirections entries, but it can become lower */
 q0:
   if(lookahead == '[') {
     indexlevel--;
