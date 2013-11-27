@@ -187,6 +187,9 @@ void argspc(void)
 	if(lookahead == VAR)
 	match(VAR);
 	idlist();
+	/*sa*/if(id_count > MAX_ARG_SIZE) {
+		err(FATAL, LEXICAL, "Max indirections size overflow.\n");
+	}/**/	
 	match(':');
 	type = smptype();
 	/*sa*/symtab_add_list(id_count, id_list, type, scope, 0, malloc(sizeof(int)*MAX_IND_SIZE));/**/
@@ -220,6 +223,9 @@ q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');		
+		/*sa*/if(satrb->indirections > MAX_IND_SIZE) {
+			err(FATAL, LEXICAL, "Max indirections size overflow.\n");
+		}/**/
 		/*sa*/satrb->dimension[satrb->indirections++] = atoi(lexeme);/**/
 		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
 		match(']');
