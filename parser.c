@@ -5,14 +5,6 @@
  */
 void mypas(void)
 {
-	debug("mypas\n");
-	// clear everything before start
-	lookahead = EOF;
-	lexeme[0] = 0;
-
-	// call gramar initial symbol
-	lookahead = gettoken(source);
-
 	match(PROGRAM);
 	match(ID);
 	match(';');
@@ -31,8 +23,7 @@ q0:
  * specification -> vardeclr | sbrdeclr
  */
 void specification(void)
-{	
-	debug("specification\n");
+{		
 	if(lookahead == VAR) {
 		vardeclr();
 	} else {
@@ -45,8 +36,7 @@ void specification(void)
 /** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
 	de uma declaração por VAR **/
 void vardeclr(void)
-{
-	debug("vardeclr\n");
+{	
 	match(VAR);
 q0:
 	if(lookahead == ID) {
@@ -61,8 +51,7 @@ q0:
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
  */
 void sbrdeclr(void)	
-{
-	debug("sbrdeclr\n");
+{	
 	sbrhead();
 q0:
 	if(lookahead != BEGIN) {
@@ -76,8 +65,7 @@ q0:
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
 void sbrhead(void)
-{
-	debug("sbrhead\n");
+{	
 	if(lookahead == PROCEDURE) {
 		match(PROCEDURE);
 		match(ID);
@@ -95,8 +83,7 @@ void sbrhead(void)
  * argdef -> [ '(' arglist ')' ]
  */
 void argdef(void)
-{
-	debug("argdef\n");
+{	
 	if(lookahead == '(') {
 		match('(');
 		arglist();
@@ -107,8 +94,7 @@ void argdef(void)
  * arglist -> argspc { ';' argspc }
  */
 void arglist(void)
-{
-	debug("arglist\n");
+{	
 q0:
 	argspc();
 	if(lookahead == ';') {
@@ -120,8 +106,7 @@ q0:
  * argspc -> [ VAR ] idlist ':' smptype 
  */
 void argspc(void)
-{
-	debug("argspc\n");
+{	
 	if(lookahead == VAR)
 	match(VAR);
 	idlist();
@@ -132,8 +117,7 @@ void argspc(void)
 * idlist -> ID { ',' ID }
 */
 void idlist(void)
-{
-	debug("idlist\n");
+{	
 q0:
 	match(ID);
 	if(lookahead == ',') {
@@ -145,8 +129,7 @@ q0:
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
 typespec(void)
-{
-	debug("typespec\n");
+{	
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
@@ -164,8 +147,7 @@ q0:
  * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
  */
 int smptype(void)
-{
-	debug("smptype\n");
+{	
 	switch(lookahead) {
 	case INTEGER:
 		match(INTEGER);
@@ -194,8 +176,7 @@ int smptype(void)
  * stmblk -> BEGIN stmtlst END
  */
 void stmblk(void)
-{
-	debug("stmblk\n");
+{	
 	match(BEGIN);
 	stmtlst();
 	match(END);
@@ -204,8 +185,7 @@ void stmblk(void)
  * stmtlst -> stmt { ';' stmt }
  */
 void stmtlst(void)
-{
-	debug("stmlst\n");
+{	
 q0:
 	stmt();
 	if(lookahead == ';') {
@@ -217,8 +197,7 @@ q0:
 * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
 */
 void stmt(void)
-{
-	debug("stmt\n");
+{	
 	switch(lookahead){
 	case BEGIN:
 		stmblk();
@@ -246,8 +225,7 @@ void stmt(void)
  * ifstmt -> IF expr THEN stmt [ ELSE stmt ]
  */
 void ifstmt(void)
-{
-	debug("ifstmt\n");
+{	
 	match(IF);
 	expr();
 	match(THEN); 
@@ -261,8 +239,7 @@ void ifstmt(void)
  * whlstmt -> WHILE expr DO stmt
  */
 void whlstmt(void)
-{
-	debug("whlstmt\n");
+{	
 	match(WHILE);
 	expr();
 	match(DO);
@@ -272,8 +249,7 @@ void whlstmt(void)
  * forstmt -> FOR ID indexing ':=' expr DOWNTO|TO expr DO stmt
  */
 void forstmt(void)
-{
-	debug("forstmt\n");
+{	
 	match(FOR);
 	match(ID);
 	indexing();
@@ -292,8 +268,7 @@ void forstmt(void)
  * repstmt -> REPEAT stmtlst UNTIL expr
  */
 void repstmt(void)
-{
-	debug("repstmt\n");
+{	
 	match(REPEAT);
 	stmtlst();
 	match(UNTIL);
@@ -304,8 +279,7 @@ void repstmt(void)
  */
  /**OBS: indexing é opcional**/
 void idstmt(void)
-{
-	debug("idstmt\n");
+{	
 	match(ID);
 	if(lookahead == '(') {
 		param();
@@ -321,8 +295,7 @@ void idstmt(void)
  * indexing -> {  '[' expr ']' }
  */
 void indexing(void)
-{
-	debug("indexing\n");
+{	
 q0:
   if(lookahead == '[') {
 	 match('[');
@@ -336,8 +309,7 @@ q0:
  */
 /**OBS: exprlst é opcional**/
 void param(void)
-{
-	debug("param\n");
+{	
 	if(lookahead == '(') {
 		match('(');
 		if(lookahead == ')') {
@@ -352,8 +324,7 @@ void param(void)
  * exprlst -> expr { ',' expr }
  */
 void exprlst(void)
-{
-	debug("exprlst\n");
+{	
 q0:
 	expr();
 	if(lookahead == ',') {
@@ -380,25 +351,23 @@ q0:
 * fact -> ID [ param | indexing ]
 */
 void expr(void)
-{ 
-	debug("expr\n");
+{ 	
 	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
 
-	E: debug( "E: %d\n", ++E_lvl);
+	E: 
 
 	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
     case '-':
-    case NOT:
-      debug( "(signal reversion) activated.\n");
+    case NOT:      
       match(lookahead);
       break;
 	}
 
-	T: debug("T: %d\n", ++T_lvl);	
+	T: 
   
-	R: debug("R: %d\n", ++R_lvl);
+	R: 
 
-	F: debug("F: %d\n", ++F_lvl); 	
+	F: 
 
 	switch(lookahead) {
     case ID:
@@ -427,32 +396,33 @@ void expr(void)
       match('(');
       goto E;
     default:
-      // se não for nenhum dos esperados, então não faz parte da gramática
+      /* se não for nenhum dos esperados, então não faz parte da gramática,
+       * sai com erro para não ficar tavado em 'loop' */
       err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
  
-	_F: debug( "_F: %d\n", --F_lvl);
+	_F: 
   
 	if(isrelop(lookahead)) {
 		match(lookahead);
 		goto R;
 	}
  
-	_R: debug( "_R: %d\n", --R_lvl);
+	_R: 
 
 	if(ismulop(lookahead)) {
 		match(lookahead);
 		goto F;
 	}
 
-	_T: debug( "_T: %d\n", --T_lvl);
+	_T: 
 
 	if(isaddop(lookahead)) {
 		match(lookahead);
 		goto T;
 	}
 
-	_E: debug( "_E: %d\n", --E_lvl);
+	_E: 
 
 	if(E_lvl > -1) {
 		match(')');
@@ -464,7 +434,7 @@ void expr(void)
  */
 ismulop(const token_t token)
 {
-	debug("ismulop\n");
+	
 	switch(token) {
 		case '*':
 		case '/':
@@ -482,7 +452,7 @@ ismulop(const token_t token)
  */
 isaddop(const token_t token)
 {
-	debug("isaddop\n");
+	
 	switch(token) {
 		case '+':
 		case '-':
@@ -497,7 +467,7 @@ isaddop(const token_t token)
  */
 isrelop(const token_t token)
 {
-	debug("isrelop\n");
+	
 	switch(token) {
 		case EQ:
 		case NEQ:

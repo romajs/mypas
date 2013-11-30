@@ -133,12 +133,22 @@ int isrelop(const token_t);
  *** EXTERN DECLARATIONS ******************************************************
  *****************************************************************************/
  
+/* main interface */
+ 
 extern FILE *source;
 
 extern FILE *object;
 
-extern void match(token_t);
-
-extern int symtab_add_list(int, char const *[], int, int);
+/* error interface */
 
 extern void err(int, int, const char *, ...);
+
+/* parser/lexer interface */
+
+extern token_t lookahead;
+
+extern char lexeme[];
+
+extern token_t gettoken(FILE *);
+
+extern void match(token_t);

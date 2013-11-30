@@ -1,6 +1,8 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
+typedef int token_t;
+
 // semantic types for expressions
 enum {
 	ID = 1025,

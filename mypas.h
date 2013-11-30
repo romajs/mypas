@@ -1,19 +1,20 @@
-#include <stdio.h>
-#include <stdarg.h>
-
-#include <args.h>
+#include <error.h>
 #include <parser.h>
 
+/* main interface */
+
+FILE *source;
+
+FILE *object;
+
 extern void mypas(void);
+
+/* error interface */
+
+extern void err(int, int, const char *, ...);
+
+/* lexer interface */
 
 extern token_t lookahead;
 
 extern char lexeme[];
-
-extern void debug(const char *, ...);
-
-extern void match_args(int, char *[]);
-
-void err(int, int, const char *, ...);
-
-extern int lineno;
