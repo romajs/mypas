@@ -1,5 +1,5 @@
 #include <string.h>
-#include <header/keyword.h>
+#include <keyword.h>
 
 keyword iskeyword(char const *query)
 {

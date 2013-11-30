@@ -1,4 +1,4 @@
-#include <header/lexer.h>
+#include <lexer.h>
 
 token_t lookahead;
 

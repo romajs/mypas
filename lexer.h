@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <header/tokens.h>
-#include <header/keyword.h>
+#include <tokens.h>
+#include <keyword.h>
 
 /* main interface */
 

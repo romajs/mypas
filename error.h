@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include <header/tokens.h>
+#include <tokens.h>
 
 /* main interface */
 

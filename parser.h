@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <header/lexer.h>
+#include <lexer.h>
 
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
