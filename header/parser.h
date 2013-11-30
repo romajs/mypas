@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <lexer.h>
+#include <header/lexer.h>
 
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
@@ -148,7 +148,5 @@ extern void err(int, int, const char *, ...);
 extern token_t lookahead;
 
 extern char lexeme[];
-
-extern token_t gettoken(FILE *);
 
 extern void match(token_t);
