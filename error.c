@@ -1,4 +1,4 @@
-#include <error.h>
+#include <header/error.h>
 
 /* função para exibição de erros, (não é tratamento) interrompe a execução 
  * caso o erro seja do tipo 'FATAL'

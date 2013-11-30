@@ -1,4 +1,4 @@
-#include <mypas.h>
+#include <header/mypas.h>
 
 main(int argc, char *argv[])
 {
