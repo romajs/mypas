@@ -354,7 +354,7 @@ void expr(void)
 { 	
 	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
 
-	E: 
+	E: E_lvl++;
 
 	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
     case '-':
@@ -363,11 +363,11 @@ void expr(void)
       break;
 	}
 
-	T: 
+	T: T_lvl++;
   
-	R: 
+	R: R_lvl++;
 
-	F: 
+	F: F_lvl++;
 
 	switch(lookahead) {
     case ID:
@@ -401,28 +401,28 @@ void expr(void)
       err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
  
-	_F: 
+	_F: F_lvl--;
   
 	if(isrelop(lookahead)) {
 		match(lookahead);
 		goto R;
 	}
  
-	_R: 
+	_R: R_lvl--;
 
 	if(ismulop(lookahead)) {
 		match(lookahead);
 		goto F;
 	}
 
-	_T: 
+	_T: T_lvl--;
 
 	if(isaddop(lookahead)) {
 		match(lookahead);
 		goto T;
 	}
 
-	_E: 
+	_E: E_lvl--;
 
 	if(E_lvl > -1) {
 		match(')');
@@ -433,8 +433,7 @@ void expr(void)
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
 ismulop(const token_t token)
-{
-	
+{	
 	switch(token) {
 		case '*':
 		case '/':
@@ -451,8 +450,7 @@ ismulop(const token_t token)
  * addop -> '+' | '-' | OR
  */
 isaddop(const token_t token)
-{
-	
+{	
 	switch(token) {
 		case '+':
 		case '-':
@@ -466,8 +464,7 @@ isaddop(const token_t token)
  * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
  */
 isrelop(const token_t token)
-{
-	
+{	
 	switch(token) {
 		case EQ:
 		case NEQ:
