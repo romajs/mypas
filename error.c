@@ -43,6 +43,7 @@ void err(int type, int nature, const char *format, ...)
 	vfprintf(object, message, arg);
 	va_end(arg);
   if(type == FATAL) {
+    fprintf(stdout, "Compilation failed.\n");
     exit(0);
   }
 }

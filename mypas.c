@@ -1,12 +1,24 @@
 #include <mypas.h>
 
-main(int argc, char *args[])
+main(int argc, char *argv[])
 {
 	source = stdin;
-	object = stdout;  
+	object = stdout;
   
-	/* call gramar initial symbol */
-	lookahead = gettoken(source);
-  
-	mypas();
+  if(argc > 1) {
+    int i;
+    /* parse main arguments */
+    for(i = 1; i < argc; i++) {
+      source = fopen(argv[i], "r+");
+      /* call gramar initial symbol */
+      lookahead = gettoken(source);    
+      mypas();      
+      fprintf(stdout, "Compilation successful for file \"%s\".\n", argv[i]);
+    }  
+  } else {  
+    /* call gramar initial symbol */
+    lookahead = gettoken(source);    
+    mypas();  
+    fprintf(stdout, "Compilation successful.\n");
+  }
 }
