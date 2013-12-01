@@ -6,7 +6,7 @@ char lexeme[MAX_ID_SIZE];
 
 int lineno = 1;
 
-// evita caracteres em branco (espaços) & comentários
+/* evita caracteres em branco (espaços) & comentários */
 void skipspaces(FILE *tape)
 {
 	token_t head;
@@ -25,7 +25,7 @@ q0:
 	ungetc(head, tape);
 }
 
-// fim de arquivo (EOF)
+/* fim de arquivo (EOF) */
 token_t isEOF(FILE *tape)
 {
 	token_t head;
@@ -37,7 +37,7 @@ token_t isEOF(FILE *tape)
 	return 0;
 }
 
-// identificadores
+/* identificadores */
 token_t isID(FILE *tape)
 {
 	token_t head;
@@ -48,8 +48,6 @@ token_t isID(FILE *tape)
 		while (isalnum(head = getc(tape))) {
 			if(i + 1 < MAX_ID_SIZE) {
 				lexeme[i++] = toupper(head);
-			} else {
-				err(FATAL, LEXICAL, "Max Integer Digits Overflow\n");
 			}
 		}
 		lexeme[i] = 0;
@@ -63,7 +61,7 @@ token_t isID(FILE *tape)
 	return 0;
 }
 
-// contantes numéricas: integers ou ponto flutuante (double)
+/* contantes numéricas: integers ou ponto flutuante (double) */
 token_t isNUM_CTE(FILE *tape)
 {
 	token_t head;
@@ -72,28 +70,24 @@ token_t isNUM_CTE(FILE *tape)
 	int precision = 0;
 	int exponent = 0;
 	
-	if(isdigit(head = getc(tape))) {  // parte inteira
+	if(isdigit(head = getc(tape))) {  /* parte inteira */
 		digits++;
 		lexeme[i++] = head;
 		while(isdigit(head = getc(tape))){
 			if(digits++ < MAX_INT_DIG) {
-				lexeme[i++] = head;		
-			} else {
-				err(FATAL, LEXICAL, "Max Integer Digits Overflow\n");
-			}
+				lexeme[i++] = head;	
+      }
 		}
-		if(head == '.') { // parte fracionário (precisão)
+		if(head == '.') { /* parte fracionário (precisão) */
 			lexeme[i++] = head;
 			while(isdigit(head = getc(tape))){
 				if(precision++ < MAX_PRC_DIG) {
 					lexeme[i++] = head;
-				} else {
-					err(FATAL, LEXICAL, "Max Precision Digits Overflow\n");
-				}
+        }
 			}
 		}
 	}
-	if(toupper(head) == 'E') { // parte exponencial
+	if(toupper(head) == 'E') { /* parte exponencial */
 		lexeme[i++] = head;	
 		if((head = getc(tape)) == '+' || head == '-') {
 			lexeme[i++] = head;	
@@ -105,9 +99,7 @@ token_t isNUM_CTE(FILE *tape)
 			while(isdigit(head = getc(tape))){
 				if(exponent++ < MAX_EXP_DIG) {
 					lexeme[i++] = head;		
-				} else {
-					err(FATAL, LEXICAL, "Max Exponents Digits Overflow\n");
-				}		
+				}	
 			}
 		}
 	}
@@ -124,6 +116,7 @@ token_t isNUM_CTE(FILE *tape)
 	}
 }
 
+/* reconhecimento de cadeias de caracteres */
 token_t isSTR_CTE(FILE *tape)
 {
 	token_t head;
@@ -145,6 +138,7 @@ token_t isSTR_CTE(FILE *tape)
 	return 0;
 }
 
+/* atribuições / assignment */
 token_t isATTR(FILE *tape)
 {
 	token_t t1, t2;
@@ -163,6 +157,7 @@ token_t isATTR(FILE *tape)
 	return 0;
 }
 
+/* operadores relacionais */
 token_t isRELOP(FILE *tape)
 {
 	token_t t1, t2;
@@ -191,13 +186,13 @@ token_t isRELOP(FILE *tape)
 	return 0;
 }
 
-// função que lê os caracteres da fita e tenta transformar em um símbolo da
-// gramática, para cada uma das funções acima (possíveis 'tokens')
-// caso nenhuma delas seja satisfeita apenas retorna o último caractere lido.
+/* função que lê os caracteres da fita e tenta transformar em um símbolo da
+ * gramática, para cada uma das funções acima (possíveis 'tokens')
+ * caso nenhuma delas seja satisfeita apenas retorna o último caractere lido.
+ */
 token_t gettoken(FILE *tape)
 {
-	token_t token;  
-	debug("gettoken: ");
+	token_t token;  	
 
 	skipspaces(tape);	
 	
@@ -217,32 +212,23 @@ token_t gettoken(FILE *tape)
 	lexeme[0] = token;
 	lexeme[1] = 0;  
 
-	END_TOKEN:  
-	debug("lookahead: %d, ", token);
-	debug("lexeme: \"%s\"\n", lexeme); 
+	END_TOKEN:  	
 	return token;
 }
 /*************************************************************************
  *** parser-to-lexer interface ********************************************
  *************************************************************************/
 
-// função que consome o 'token' atual e obtém o próximo 'token' da fita
+/* função que consome o 'token' atual e obtém o próximo 'token' da fita */
 void match(token_t predicted) {
-	debug("match? ");
-	debug("lookahead: %d, ", lookahead);
-	debug("predicted: %d, ", predicted);
-	debug("lexeme: \"%s\" ", lexeme);
+
 	if(lookahead == predicted) {
-		// importante: deve verificar se já não está em fim de arquivo, se
-		// não irá requisitar uma nova entrada de dados ao usuário
-		if(lookahead != EOF) {
-			debug("MATCH!\n");
+		/* importante: deve verificar se já não está em fim de arquivo, se
+		 * não irá requisitar uma nova entrada de dados ao usuário */
+		if(lookahead != EOF) {			
 			lookahead = gettoken(source);
-		} else {
-			debug("No more tokens in tape to get!\n");
 		}
-	} else {
-		debug("FAILED!\n");
+	} else {		
 		err(FATAL, LEXICAL, "Token mismatch.\n");
 	}
 }

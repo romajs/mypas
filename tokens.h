@@ -1,6 +1,8 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
+typedef int token_t;
+
 // object types
 enum {
   ATOMIC = 1, // INTEGER, REAL, STRING, ...

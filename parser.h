@@ -137,12 +137,38 @@ int isrelop(const token_t);
  *** EXTERN DECLARATIONS ******************************************************
  *****************************************************************************/
  
+/* main interface */
+ 
 extern FILE *source;
 
 extern FILE *object;
 
-extern void match(token_t);
-
-//extern int symtab_add_list(int, char const *[], int, int);
+/* error interface */
 
 extern void err(int, int, const char *, ...);
+
+/* parser/lexer interface */
+
+extern token_t lookahead;
+
+extern char lexeme[];
+
+extern void match(token_t);
+
+/* symtab interface */
+
+extern int symtab_entry;
+
+int symtab_reset_entries(int);
+
+int symtab_next_entry();
+
+int symtab_lookup(const char *, int);
+
+int symtab_retrieve(const char *, int);
+
+int symtab_validate(const char*);
+
+int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
+
+void set_subroutine_argument_list(int, int, int);

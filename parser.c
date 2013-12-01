@@ -9,28 +9,18 @@
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
  */
 void mypas(void)
-{
-	debug("<mypas>\n");
-	// clear everything before start
-	lookahead = EOF;
-	lexeme[0] = 0;
-
-	// call gramar initial symbol
-	lookahead = gettoken(source);
-
+{	
 	match(PROGRAM);
 	match(ID);
 	match(';');
 	/*sa*/scope = GLOBAL;/**/
-q0:
-	debug("mypas:q0\n");
+q0:	
 	if(lookahead != BEGIN) {
 		specification();
 		goto q0;
 	}
 	stmblk();
-	match('.');
-	debug("</mypas>\n");
+	match('.');	
 }	
 /*****************************************************************************
 *** object declaration scope is defined next: ********************************
@@ -39,14 +29,12 @@ q0:
  * specification -> vardeclr | sbrdeclr
  */
 void specification(void)
-{	
-	debug("<specification>\n");
+{		
 	if(lookahead == VAR) {
 		vardeclr();
 	} else {
 		sbrdeclr();
-	}	
-	debug("</specification>\n");
+	}		
 }
 /*
  * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
@@ -54,8 +42,7 @@ void specification(void)
 /** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
 	de uma declaração por VAR **/
 void vardeclr(void)
-{
-	debug("<vardeclr>\n");
+{	
 	/*sa*/SEMANTIC_ATTRIB *satrb;/**/
 	match(VAR);
 q0:
@@ -69,15 +56,13 @@ q0:
 		/*sa*/symtab_add_list(id_count, id_list, satrb->type, satrb->scope,
       satrb->indirections, satrb->dimension);/**/
 		goto q0;
-	}	
-	debug("</vardeclr>\n");
+	}		
 }
 /*
  * sbrdeclr ->  sbrhead { vardeclr } stmblk ';'
  */
 void sbrdeclr(void)	
-{
-	debug("<sbrdeclr>\n");
+{	
 	/* store begin of subroutine declarations plus the declaration itself */
   int symtab_first_entry = symtab_entry + 1;
 	sbrhead();	
@@ -92,16 +77,13 @@ q0:
 	/* reset symtab entries, eliminating LOCAL declarations */
   symtab_reset_entries(symtab_first_entry);
 	
-	/* volta escopo p/ global */scope = GLOBAL;
-	
-	debug("</sbrdeclr>\n");
+	/* volta escopo p/ global */scope = GLOBAL;	
 }
 /*
  * sbrhead -> PROCEDURE ID argdef ';' | FUNCTION ID argdef ':' smptype ';'
  */
 void sbrhead()
-{
-	debug("sbrhead\n");  
+{	
 	/* reserve one address to subroutine */int entry = symtab_next_entry();
   /* fill subroutine attributes */
 	/* set subroutine scope to GLOBAL */symtab[entry].scope = scope;
@@ -120,8 +102,7 @@ void sbrhead()
 		match(PROCEDURE);
     /* validate id subroutine */symtab_validate(lexeme);
 		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);
-    debug("%s was added susessfully to symtab\n", symtab[entry].name);
-    debug_symtab_entry(entry);
+    
 		match(ID);    
     /* store begin of arg declarations */symtab_first_entry = symtab_entry;
 		argdef();
@@ -130,8 +111,7 @@ void sbrhead()
 		match(FUNCTION);
     /* validate id subroutine */symtab_validate(lexeme);
 		/* save subroutine lexeme */strcpy(symtab[entry].name, lexeme);      
-    debug("%s was added susessfully to symtab\n", symtab[entry].name);
-    debug_symtab_entry(entry);
+
     /* In case of FUNCTION, a variable with same name must be added to symtab
       to be used internally in 'stmblk' to set the returng value from the
       function, but the scope of this variavel need to become current scope */
@@ -139,8 +119,7 @@ void sbrhead()
     symtab[entry_var] = symtab[entry];    
     symtab[entry_var].scope = scope;   
     symtab[entry_var].objtype = 0;
-    debug("%s was added susessfully to symtab\n", symtab[entry].name);
-    debug_symtab_entry(entry_var);
+
 		match(ID);    
     /* store begin of arg declarations */symtab_first_entry = symtab_entry;
 		argdef();
@@ -156,8 +135,7 @@ void sbrhead()
  * argdef -> [ '(' arglist ')' ]
  */
 void argdef(void)
-{
-	debug("argdef\n");
+{	
 	if(lookahead == '(') {
 		match('(');
 		arglist();
@@ -168,8 +146,7 @@ void argdef(void)
  * arglist -> argspc { ';' argspc }
  */
 void arglist(void)
-{
-	debug("arglist\n");
+{	
 q0:
 	argspc();
 	if(lookahead == ';') {
@@ -181,8 +158,7 @@ q0:
  * argspc -> [ VAR ] idlist ':' smptype
  */
 void argspc(void)
-{
-	debug("argspc\n");
+{	
 	/*sa*/int type;/**/
 	if(lookahead == VAR)
 	match(VAR);
@@ -200,8 +176,7 @@ void argspc(void)
 char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 int id_count = 0;
 void idlist(void)
-{
-	debug("idlist\n");
+{	
 	/*sa*/id_count = 0;/**/
 q0:
 	/*sa*/strcpy(id_list[id_count++], lexeme);/**/
@@ -215,8 +190,7 @@ q0:
  * typespec -> smptype | ARRAY '[' UINT ']' OF typespec
  */
 void typespec(SEMANTIC_ATTRIB *satrb)
-{
-	debug("typespec\n");
+{	
 	/*sa*/satrb->indirections = 0;/**/
 	/*sa*/satrb->type = 0;/**/ // CUIDADO CONFUNDIR COM PROCEDURE!!!
 q0:
@@ -240,8 +214,7 @@ q0:
  * smptype -> INTEGER | REAL | DOUBLE | BOOLEAN | STRING
  */
 int smptype(void)
-{
-	debug("smptype\n");
+{	
 	switch(lookahead) {
 	case INTEGER:
 		match(INTEGER);
@@ -270,8 +243,7 @@ int smptype(void)
  * stmblk -> BEGIN stmtlst END
  */
 void stmblk(void)
-{
-	debug("stmblk\n");
+{	
 	match(BEGIN);
 	stmtlst();
 	match(END);
@@ -280,8 +252,7 @@ void stmblk(void)
  * stmtlst -> stmt { ';' stmt }
  */
 void stmtlst(void)
-{
-	debug("stmlst\n");
+{	
 q0:
 	stmt();
 	if(lookahead == ';') {
@@ -293,8 +264,7 @@ q0:
 * stmt -> <epsilon> | ifstmt | whlstmt | forstmt | repstmt | idstmt | stmblk
 */
 void stmt(void)
-{
-	debug("stmt\n");
+{	
 	switch(lookahead){
 	case BEGIN:
 		stmblk();
@@ -322,8 +292,7 @@ void stmt(void)
  * ifstmt -> IF expr THEN stmt [ ELSE stmt ]
  */
 void ifstmt(void)
-{
-	debug("ifstmt\n");
+{	
 	match(IF);
 	expr();
 	match(THEN); 
@@ -337,8 +306,7 @@ void ifstmt(void)
  * whlstmt -> WHILE expr DO stmt
  */
 void whlstmt(void)
-{
-	debug("whlstmt\n");
+{	
 	match(WHILE);
 	expr();
 	match(DO);
@@ -348,8 +316,7 @@ void whlstmt(void)
  * forstmt -> FOR ID indexing ':=' expr DOWNTO|TO expr DO stmt
  */
 void forstmt(void)
-{
-	debug("forstmt\n");
+{	
 	match(FOR);
   int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
@@ -369,8 +336,7 @@ void forstmt(void)
  * repstmt -> REPEAT stmtlst UNTIL expr
  */
 void repstmt(void)
-{
-	debug("repstmt\n");
+{	
 	match(REPEAT);
 	stmtlst();
 	match(UNTIL);
@@ -381,8 +347,7 @@ void repstmt(void)
  */
  /**OBS: indexing é opcional**/
 void idstmt(void)
-{
-	debug("idstmt\n");
+{	
   int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
 	if(lookahead == '(' || symtab[entry].attributes) {
@@ -399,8 +364,7 @@ void idstmt(void)
  * indexing -> {  '[' expr ']' }
  */
 indexing(int indexlevel)
-{
-	debug("<indexing>\n");
+{	
   /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
     overload indirections entries, but it can become lower */
 q0:
@@ -411,11 +375,11 @@ q0:
     match(']');
     goto q0;
   }  
-  debug("\tindexlevel = %d\n", indexlevel);
+  
   if(indexlevel < 0) {
     err(FATAL, SEMANTIC, "Too many index levels.\n");
   }
-  debug("</indexing>\n");
+  
   return indexlevel >= 0;
 }
 /*
@@ -423,10 +387,9 @@ q0:
  */
 /**OBS: exprlst é opcional**/
 param(int entry)
-{
-	debug("<param>\n");
+{	
   /* start paramindex */ int paramindex = symtab[entry].attributes;
-  debug("symtab[%d].attributes = %d\n", entry, symtab[entry].attributes);
+  
   /* REMINDER: paramindex must match all attributes entries, in case if the
     subroutine has no arguments then it may match '()' or not (optional) */
   match('(');
@@ -438,27 +401,26 @@ param(int entry)
   }
   /* REMINDER: paramindex must be treated here and not in 'exprlst', because it
     may have none */    
-  debug("\tparamindex = %d\n", paramindex);
+  
   if(paramindex < 0) {
     err(FATAL, SEMANTIC, "Too many parameters.\n");
   } else if(paramindex > 0) {
     err(FATAL, SEMANTIC, "Too few parameters.\n");
   }
-  debug("</param>\n");
+  
   return paramindex == 0;
 }
 /*
  * exprlst -> expr { ',' expr }
  */
 int exprlst(int paramindex)
-{
-	debug("exprlst\n");
+{	
    /* REMINDER: indexlevel is decremented as '[' is matched, and it may not
     overload indirections entrie, but it can become lower */
 q0:
 	expr();
   paramindex--;
-  debug("\tparamindex = %d\n", paramindex);
+  
 	if(lookahead == ',') {
 		match(',');
 		goto q0;
@@ -484,31 +446,29 @@ q0:
 * fact -> ID [ param | indexing ]
 */
 void expr(void)
-{ 
-	debug("expr\n");
+{ 	
 	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
 
-	E: debug( "E: %d\n", ++E_lvl);
+	E: E_lvl++;
 
 	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
     case '-':
     case NOT:
-      debug( "(signal reversion) activated.\n");
+      
       match(lookahead);
       break;
 	}
 
-	T: debug("T: %d\n", ++T_lvl);	
+	T: T_lvl++;	
   
-	R: debug("R: %d\n", ++R_lvl);
+	R: R_lvl++;
 
-	F: debug("F: %d\n", ++F_lvl); 	
+	F: F_lvl++; 	
 
   /* id symtab position */int entry;
 	switch(lookahead) {
     case ID:
       /* search for id in symtab */entry = symtab_retrieve(lexeme, 1);
-      debug_symtab_entry(entry);
       match(ID);      
       if(lookahead == '(' || symtab[entry].attributes) {
         /* match entry attributes */param(entry);
@@ -538,28 +498,28 @@ void expr(void)
       err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
  
-	_F: debug( "_F: %d\n", --F_lvl);
+	_F: F_lvl--;
   
 	if(isrelop(lookahead)) {
 		match(lookahead);
 		goto R;
 	}
  
-	_R: debug( "_R: %d\n", --R_lvl);
+	_R: R_lvl--;
 
 	if(ismulop(lookahead)) {
 		match(lookahead);
 		goto F;
 	}
 
-	_T: debug( "_T: %d\n", --T_lvl);
+	_T: T_lvl--;
 
 	if(isaddop(lookahead)) {
 		match(lookahead);
 		goto T;
 	}
 
-	_E: debug( "_E: %d\n", --E_lvl);
+	_E: E_lvl--;
 
 	if(E_lvl > -1) {
 		match(')');
@@ -570,8 +530,7 @@ void expr(void)
  * mulop -> '*' | '/' | DIV | MOD | AND
  */
 ismulop(const token_t token)
-{
-	debug("ismulop\n");
+{	
 	switch(token) {
 		case '*':
 		case '/':
@@ -588,8 +547,7 @@ ismulop(const token_t token)
  * addop -> '+' | '-' | OR
  */
 isaddop(const token_t token)
-{
-	debug("isaddop\n");
+{	
 	switch(token) {
 		case '+':
 		case '-':
@@ -603,8 +561,7 @@ isaddop(const token_t token)
  * relop -> '>' | '>=' | '<' | '<=' | '=' | '<>'
  */
 isrelop(const token_t token)
-{
-	debug("isrelop\n");
+{	
 	switch(token) {
 		case EQ:
 		case NEQ:
