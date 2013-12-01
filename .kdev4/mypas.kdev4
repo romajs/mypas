@@ -1,12 +1,21 @@
 [Buildset]
 BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\n\x00m\x00y\x00p\x00a\x00s)
 
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=execute
+Configured Launchers=nativeAppLauncher
+Name=New Native Application Configuration
+Type=Native Application
+
 [Launch][Launch Configuration 0][Data]
 Arguments=test.pas
-Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x1c\x001\x00-\x00m\x00y\x00p\x00a\x00s\x00-\x00s\x00y\x00m\x00t\x00a\x00b)
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
 Dependency Action=Build
 EnvironmentGroup=default
-Executable=file:///home/romajs/dev/mypas/1-mypas-symtab/mypas
+Executable=file:///home/romajs/dev/mypas/3-mypas-codegen/mypas
 External Terminal=konsole --noclose --workdir %workdir -e %exe
 Project Target=
 Use External Terminal=false

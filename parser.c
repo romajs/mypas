@@ -5,20 +5,25 @@
 
 /*sa*/int scope;/**/
 
+int loopcounter = 1;
+
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
  */
 void mypas(void)
 {	
+	/** .data **/datalbl();/**/
 	match(PROGRAM);
 	match(ID);
 	match(';');
+	/** .globl **/globlbl();/**/
 	/*sa*/scope = GLOBAL;/**/
 q0:	
 	if(lookahead != BEGIN) {
 		specification();
 		goto q0;
 	}
+	/** .main **/mainlbl();/**/
 	stmblk();
 	match('.');	
 }	
@@ -294,53 +299,86 @@ void stmt(void)
 void ifstmt(void)
 {	
 	match(IF);
+	/**/int endiflbl, elselbl;/**/
+	/**/endiflbl = elselbl = loopcounter++;/* OK. se não houver else, if <-- else */
 	expr();
+	/** gofalse elselbl **/gofalse(elselbl);/**/
 	match(THEN); 
 	stmt();
 	if(lookahead == ELSE){
 		match(ELSE);
+		/** endiflbl **/
+		/**/int endiflbl = loopcounter++;/**/
+		/** elselbl **/setlbl(elselbl);/**/
 		stmt();
 	}
+	/** endiflbl **/setlbl(endiflbl);/**/
 }
 /*
  * whlstmt -> WHILE expr DO stmt
  */
 void whlstmt(void)
 {	
+	/**/ int while_head = loopcounter++;/**/
+	/**/int end_while = loopcounter++;/**/
 	match(WHILE);
+	/** while_head **/setlbl(while_head);/**/
 	expr();
 	match(DO);
+	/** gofalse end_while **/gofalse(end_while);/**/
 	stmt();
+	/** goto while_head **/gotolbl(while_head);/**/
+	/** end_while **/setlbl(end_while);/**/	
 }
 /*
  * forstmt -> FOR ID indexing ':=' expr DOWNTO|TO expr DO stmt
  */
 void forstmt(void)
 {	
+	/**/int step;/**/
+	/**/int for_head = loopcounter++;/**/
+	/**/int end_for = loopcounter++;/**/
+	/**/char varadress[MAX_ID_SIZE << 1];/**/
+	/**/int offset;/**/
 	match(FOR);
-  int entry = symtab_retrieve(lexeme, 0);
+	/** get variable offset from symbol table **/offset = symtab_lookup(lexeme, 0);/**/
+	int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
 	indexing(symtab[entry].indirections);
 	match(ATTR); /* ':=' */
-	expr();
+	double value = 0.00;
+	expr();/** store 'attribution' to variable offset **/pop(offset);mov(value);/**/
+	/** for_head **/setlbl(for_head);/**/
 	if(lookahead == TO) {
 		match(TO);
+		/**/step =1;/**/
 	} else {
 		match(DOWNTO);
+		/**/step =-1;/**/
 	}
 	expr();
+	/** expr result must be stored in the %eax-register  TODO **/
 	match(DO);
+	/** compare expr (condition) with variable (attribution) **/cmp(varadress);/**/
+	/** gofalse end_for **/gotosteplbl(step, end_for);/**/
 	stmt();
+	/** update iterative varibale TODO **/
+	/** variable += step **/stepc(step, varadress);/**/
+	/** goto for_head **/gotolbl(for_head);/**/
+	/** end_for **/setlbl(end_for);/**/
 }
 /*
  * repstmt -> REPEAT stmtlst UNTIL expr
  */
 void repstmt(void)
 {	
+	/**/ int repeat_head = loopcounter++;/**/
 	match(REPEAT);
+	/** repeat_head **/setlbl(repeat_head);/**/
 	stmtlst();
 	match(UNTIL);
 	expr();
+	/** gofalse repeat_head **/gofalse(repeat_head);/**/
 } 
 /*
  * idstmt -> ID [ param | indexing ':=' expr ]

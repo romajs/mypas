@@ -5,6 +5,8 @@
 
 extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 extern int id_count;
+extern int scope;
+extern int loopcounter;
 
 /*
  * mypas -> PROGRAM ID ';' { specification } stmblk '.'
@@ -159,16 +161,44 @@ extern void match(token_t);
 
 extern int symtab_entry;
 
-int symtab_reset_entries(int);
+extern int symtab_reset_entries(int);
 
-int symtab_next_entry();
+extern int symtab_next_entry();
 
-int symtab_lookup(const char *, int);
+extern int symtab_lookup(const char *, int);
 
-int symtab_retrieve(const char *, int);
+extern int symtab_retrieve(const char *, int);
 
-int symtab_validate(const char*);
+extern int symtab_validate(const char*);
 
-int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
+extern int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
 
-void set_subroutine_argument_list(int, int, int);
+extern void set_subroutine_argument_list(int, int, int);
+
+/* codegen interface */
+
+extern void mainlbl();
+
+extern void setlbl(int);
+
+extern void gofalse(int);
+
+extern void gotolbl(int);
+
+extern void gotosteplbl(int, int);
+
+extern void pop(int);
+
+extern void mov(int);
+
+extern void cmp(const char*);
+
+extern void jg(int);
+
+extern void jl(int);
+
+extern void stepc(int, const char*);
+
+extern void inc(const char*);
+
+extern void dec(const char*);
