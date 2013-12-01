@@ -448,15 +448,17 @@ q0:
 void expr(void)
 { 	
 	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
+	opsp = -1, sp = -1;
 
 	E: E_lvl++;
 
 	switch(lookahead) { /* inversão de sinal ('-') e negação (NOT) */
-    case '-':
-    case NOT:
-      
-      match(lookahead);
-      break;
+	case '-':
+		push_operand(INT_CTE, "0");
+	case NOT:		
+		push_oper(lookahead, E_lvl);
+		match(lookahead);
+		break;
 	}
 
 	T: T_lvl++;	
@@ -465,60 +467,72 @@ void expr(void)
 
 	F: F_lvl++; 	
 
-  /* id symtab position */int entry;
+	/* id symtab position */int entry;
 	switch(lookahead) {
-    case ID:
-      /* search for id in symtab */entry = symtab_retrieve(lexeme, 1);
-      match(ID);      
-      if(lookahead == '(' || symtab[entry].attributes) {
-        /* match entry attributes */param(entry);
-      }
-      /**OBS: indexing é opcional**/
-      /* match entry indirections */indexing(symtab[entry].indirections);		
-      break;
-    /**************************************************************************
-    *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
-    **************************************************************************/
-    case TRUE: 
-    case FALSE:
-    case INT_CTE:
-    case REAL_CTE:
-    case DBL_CTE:
-    case STR_CTE:
-      match(lookahead);
-      break;
-    /**************************************************************************
-     *** End of Constants defitions *******************************************
-     *************************************************************************/
-    case '(':
-      match('(');
-      goto E;
-    default:
-      /* se não for nenhum dos esperados, então não faz parte da gramática */
-      err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
+	case ID:
+		/* search for id in symtab */entry = symtab_retrieve(lexeme, 1);
+		match(ID);      
+		if(lookahead == '(' || symtab[entry].attributes) {
+			/* match entry attributes */param(entry);
+		}
+		/**OBS: indexing é opcional**/
+		/* match entry indirections */indexing(symtab[entry].indirections);		
+		break;
+	/**************************************************************************
+	*** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
+	**************************************************************************/
+	case TRUE: 
+	case FALSE:
+	case INT_CTE:
+	case REAL_CTE:
+	case DBL_CTE:
+	case STR_CTE:
+		push_operand(lookahead, lexeme);
+		match(lookahead);
+		break;
+	/**************************************************************************
+	*** End of Constants defitions *******************************************
+	*************************************************************************/
+	case '(':
+		match('(');
+		goto E;
+	default:
+		/* se não for nenhum dos esperados, então não faz parte da gramática */
+		err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
+	
+	exec_oper(); /* execucao de operacoes agendadas na pilha */
  
 	_F: F_lvl--;
   
 	if(isrelop(lookahead)) {
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto R;
 	}
  
+	exec_oper(); /* execucao de operacoes agendadas na pilha */
+	
 	_R: R_lvl--;
 
 	if(ismulop(lookahead)) {
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto F;
 	}
 
+	exec_oper(); /* execucao de operacoes agendadas na pilha */
+	
 	_T: T_lvl--;
 
 	if(isaddop(lookahead)) {
+		push_oper(lookahead, E_lvl);
 		match(lookahead);
 		goto T;
 	}
 
+	exec_oper(); /* execucao de operacoes agendadas na pilha */
+	
 	_E: E_lvl--;
 
 	if(E_lvl > -1) {

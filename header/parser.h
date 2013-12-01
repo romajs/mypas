@@ -172,3 +172,15 @@ int symtab_validate(const char*);
 int symtab_add_list(int, char [MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1], int, int, int, int[MAX_IND_SIZE]);
 
 void set_subroutine_argument_list(int, int, int);
+
+/* typecheck interface */
+
+extern int opsp;
+
+extern int sp;
+
+void push_operand(token_t, const char *);
+
+void push_oper(token_t, int);
+
+extern void exec_oper(void);

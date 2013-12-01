@@ -13,6 +13,18 @@ Use External Terminal=false
 Working Directory=
 isExecutable=true
 
+[Launch][Launch Configuration 1][Data]
+Arguments=test.pas
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00"\x002\x00-\x00m\x00y\x00p\x00a\x00s\x00-\x00t\x00y\x00p\x00e\x00c\x00h\x00e\x00c\x00k)
+Dependency Action=Build
+EnvironmentGroup=default
+Executable=file:///home/romajs/dev/mypas/2-mypas-typecheck/mypas
+External Terminal=konsole --noclose --workdir %workdir -e %exe
+Project Target=
+Use External Terminal=false
+Working Directory=
+isExecutable=true
+
 [MakeBuilder]
 Default Make Environment Profile=0
 Number Of Jobs=1
