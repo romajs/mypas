@@ -1,27 +1,27 @@
 PROGRAM test101;
 VAR
-  id: Integer;
-  produto: String;
-  valor, custo: Real;
-  qtde: Double;
-  ativo: Boolean;
+	id: Integer;
+	produto: String;
+	valor, custo: Real;
+	qtde: Double;
+	ativo: Boolean;
 VAR
 	matrix: Array[3] of array [4] of integer;
 { Função que imprime "Hello" na saída }
 PROCEDURE SayHello;
 var
-  msg: String;
+	msg: String;
 BEGIN
-  msg := 'Hello';
-  Writeln(msg);
+	msg := 'Hello';
+	Writeln(msg);
 END;
 { Função de Fibonacci }
 FUNCTION Fibonacci(x: Integer): Integer;
 BEGIN
-  IF (x = 0) or (x = 1) THEN
-    result := x
-  ELSE
-    result := Fibonacci(x - 2) + Fibonacci(x - 1);
+	IF (x = 0) or (x = 1) THEN
+		result := x
+	ELSE
+		result := Fibonacci(x - 2) + Fibonacci(x - 1);
 END;
 { Função de Fatorial }
 FUNCTION Fatorial(i: Integer): Integer;
@@ -39,35 +39,35 @@ END;
 { Loop infinito }
 PROCEDURE Infinito;
 BEGIN
-  REPEAT
-    { to the infinty and beyond... }
-    ;
-  UNTIL true
+	REPEAT
+		{ to the infinty and beyond... }
+		;
+	UNTIL true
 END;
 { Imprime elementos de um Array }
 PROCEDURE ImprimeArray;
 VAR
-  arr: ARRAY[10] OF Integer;
-  i: Integer;
+	arr: ARRAY[10] OF Integer;
+	i: Integer;
 BEGIN
-  FOR i := 0 TO 10 DO
-    WriteLn(arr[i]);
+	FOR i := 0 TO 10 DO
+		WriteLn(arr[i]);
 END;
 PROCEDURE testerelop(x, y: Integer; s: String);
 BEGIN
-  IF (x > y) THEN
+	IF (x > y) THEN
 		s := 'ok'
-  ELSE IF (x >= y) THEN
+	ELSE IF (x >= y) THEN
 		s := 'ok'
-  ELSE IF (x < y) THEN
+	ELSE IF (x < y) THEN
 		s := 'ok'
-  ELSE IF (x <= y) THEN
+	ELSE IF (x <= y) THEN
 		s := 'ok'
-  ELSE IF (x >= y) THEN
+	ELSE IF (x >= y) THEN
 		s := 'ok'
-  ELSE IF (x <> y) THEN
+	ELSE IF (x <> y) THEN
 		s := 'ok'		
-  ELSE
+	ELSE
 		s := 'not ok';
 END;
 BEGIN

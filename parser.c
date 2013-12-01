@@ -5,16 +5,16 @@
  */
 void mypas(void)
 {
-  match(PROGRAM);
-  match(ID);
-  match(';');
+	match(PROGRAM);
+	match(ID);
+	match(';');
 q0:
-  if (lookahead != BEGIN) {
-    specification();
-    goto q0;
-  }
-  stmblk();
-  match('.');
+	if (lookahead != BEGIN) {
+		specification();
+		goto q0;
+	}
+	stmblk();
+	match('.');
 }
 
 /*****************************************************************************
@@ -25,29 +25,29 @@ q0:
  */
 void specification(void)
 {
-  if (lookahead == VAR) {
-    vardeclr();
-  } else {
-    sbrdeclr();
-  }
+	if (lookahead == VAR) {
+		vardeclr();
+	} else {
+		sbrdeclr();
+	}
 }
 
 /*
  * vardeclr ->  VAR idlist ':' typespec ';' { idlist ':' typespec ';' }
  */
-/** OBS: Esta parte foi modificada (está diferente do Eraldo) para aceitar mais 
-	de uma declaração por VAR **/
+/** OBS: Esta parte foi modificada (esta diferente do Eraldo) para aceitar mais
+de uma declaracao por VAR **/
 void vardeclr(void)
 {
-  match(VAR);
+	match(VAR);
 q0:
-  if (lookahead == ID) {
-    idlist();
-    match(':');
-    typespec();
-    match(';');
-    goto q0;
-  }
+	if (lookahead == ID) {
+		idlist();
+		match(':');
+		typespec();
+		match(';');
+		goto q0;
+	}
 }
 
 /*
@@ -55,14 +55,14 @@ q0:
  */
 void sbrdeclr(void)
 {
-  sbrhead();
+	sbrhead();
 q0:
-  if (lookahead != BEGIN) {
-    vardeclr();
-    goto q0;
-  }
-  stmblk();
-  match(';');
+	if (lookahead != BEGIN) {
+		vardeclr();
+		goto q0;
+	}
+	stmblk();
+	match(';');
 }
 
 /*
@@ -70,18 +70,18 @@ q0:
  */
 void sbrhead(void)
 {
-  if (lookahead == PROCEDURE) {
-    match(PROCEDURE);
-    match(ID);
-    argdef();
-  } else {
-    match(FUNCTION);
-    match(ID);
-    argdef();
-    match(':');
-    smptype();
-  }
-  match(';');
+	if (lookahead == PROCEDURE) {
+		match(PROCEDURE);
+		match(ID);
+		argdef();
+	} else {
+		match(FUNCTION);
+		match(ID);
+		argdef();
+		match(':');
+		smptype();
+	}
+	match(';');
 }
 
 /*
@@ -89,11 +89,11 @@ void sbrhead(void)
  */
 void argdef(void)
 {
-  if (lookahead == '(') {
-    match('(');
-    arglist();
-    match(')');
-  }
+	if (lookahead == '(') {
+		match('(');
+		arglist();
+		match(')');
+	}
 }
 
 /*
@@ -102,23 +102,23 @@ void argdef(void)
 void arglist(void)
 {
 q0:
-  argspc();
-  if (lookahead == ';') {
-    match(';');
-    goto q0;
-  }
+	argspc();
+	if (lookahead == ';') {
+		match(';');
+		goto q0;
+	}
 }
 
 /*
- * argspc -> [ VAR ] idlist ':' smptype 
+ * argspc -> [ VAR ] idlist ':' smptype
  */
 void argspc(void)
 {
-  if (lookahead == VAR)
-    match(VAR);
-  idlist();
-  match(':');
-  smptype();
+	if (lookahead == VAR)
+		match(VAR);
+	idlist();
+	match(':');
+	smptype();
 }
 
 /*
@@ -127,11 +127,11 @@ void argspc(void)
 void idlist(void)
 {
 q0:
-  match(ID);
-  if (lookahead == ',') {
-    match(',');
-    goto q0;
-  }
+	match(ID);
+	if (lookahead == ',') {
+		match(',');
+		goto q0;
+	}
 }
 
 /*
@@ -140,16 +140,16 @@ q0:
 typespec(void)
 {
 q0:
-  if (lookahead == ARRAY) {
-    match(ARRAY);
-    match('[');
-    match(INT_CTE);		/* Our INT_CTE is already UNSIGNED! */
-    match(']');
-    match(OF);
-    goto q0;
-  } else {
-    smptype();
-  }
+	if (lookahead == ARRAY) {
+		match(ARRAY);
+		match('[');
+		match(INT_CTE);/* Our INT_CTE is already UNSIGNED! */
+		match(']');
+		match(OF);
+		goto q0;
+	} else {
+		smptype();
+	}
 }
 
 /*
@@ -157,26 +157,26 @@ q0:
  */
 int smptype(void)
 {
-  switch (lookahead) {
-    case INTEGER:
-      match(INTEGER);
-      return 1;
-    case REAL:
-      match(REAL);
-      return 2;
-    case DOUBLE:
-      match(DOUBLE);
-      return 3;
-    case BOOLEAN:
-      match(BOOLEAN);
-      return 4;
-    case STRING:
-      match(STRING);
-      return 5;
-    default:
-      /* ERROR TYPE */
-      return -1;
-  }
+	switch (lookahead) {
+	case INTEGER:
+		match(INTEGER);
+		return 1;
+	case REAL:
+		match(REAL);
+		return 2;
+	case DOUBLE:
+		match(DOUBLE);
+		return 3;
+	case BOOLEAN:
+		match(BOOLEAN);
+		return 4;
+	case STRING:
+		match(STRING);
+		return 5;
+	default:
+		/* ERROR TYPE */
+		return -1;
+	}
 }
 
 /*****************************************************************************
@@ -187,9 +187,9 @@ int smptype(void)
  */
 void stmblk(void)
 {
-  match(BEGIN);
-  stmtlst();
-  match(END);
+	match(BEGIN);
+	stmtlst();
+	match(END);
 }
 
 /*
@@ -198,11 +198,11 @@ void stmblk(void)
 void stmtlst(void)
 {
 q0:
-  stmt();
-  if (lookahead == ';') {
-    match(';');
-    goto q0;
-  }
+	stmt();
+	if (lookahead == ';') {
+		match(';');
+		goto q0;
+	}
 }
 
 /*
@@ -210,43 +210,43 @@ q0:
 */
 void stmt(void)
 {
-  switch (lookahead) {
-    case BEGIN:
-      stmblk();
-      break;
-    case IF:
-      ifstmt();
-      break;
-    case WHILE:
-      whlstmt();
-      break;
-    case FOR:
-      forstmt();
-      break;
-    case REPEAT:
-      repstmt();
-      break;
-    case ID:
-      idstmt();
-      break;
-    default:
-      ;
-  }
+	switch (lookahead) {
+	case BEGIN:
+		stmblk();
+		break;
+	case IF:
+		ifstmt();
+		break;
+	case WHILE:
+		whlstmt();
+		break;
+	case FOR:
+		forstmt();
+		break;
+	case REPEAT:
+		repstmt();
+		break;
+	case ID:
+		idstmt();
+		break;
+	default:
+		;
+	}
 }
 
-/* 
+/*
  * ifstmt -> IF expr THEN stmt [ ELSE stmt ]
  */
 void ifstmt(void)
 {
-  match(IF);
-  expr();
-  match(THEN);
-  stmt();
-  if (lookahead == ELSE) {
-    match(ELSE);
-    stmt();
-  }
+	match(IF);
+	expr();
+	match(THEN);
+	stmt();
+	if (lookahead == ELSE) {
+		match(ELSE);
+		stmt();
+	}
 }
 
 /*
@@ -254,10 +254,10 @@ void ifstmt(void)
  */
 void whlstmt(void)
 {
-  match(WHILE);
-  expr();
-  match(DO);
-  stmt();
+	match(WHILE);
+	expr();
+	match(DO);
+	stmt();
 }
 
 /*
@@ -265,19 +265,19 @@ void whlstmt(void)
  */
 void forstmt(void)
 {
-  match(FOR);
-  match(ID);
-  indexing();
-  match(ATTR);			/* ':=' */
-  expr();
-  if (lookahead == TO) {
-    match(TO);
-  } else {
-    match(DOWNTO);
-  }
-  expr();
-  match(DO);
-  stmt();
+	match(FOR);
+	match(ID);
+	indexing();
+	match(ATTR);/* ':=' */
+	expr();
+	if (lookahead == TO) {
+		match(TO);
+	} else {
+		match(DOWNTO);
+	}
+	expr();
+	match(DO);
+	stmt();
 }
 
 /*
@@ -285,28 +285,28 @@ void forstmt(void)
  */
 void repstmt(void)
 {
-  match(REPEAT);
-  stmtlst();
-  match(UNTIL);
-  expr();
+	match(REPEAT);
+	stmtlst();
+	match(UNTIL);
+	expr();
 }
 
 /*
  * idstmt -> ID [ param | indexing ':=' expr ]
  */
- /**OBS: indexing é opcional**/
+/**OBS: indexing e opcional**/
 void idstmt(void)
 {
-  match(ID);
-  if (lookahead == '(') {
-    param();
-  } else {
-    indexing();
-    if (lookahead == ATTR) {
-      match(ATTR);		/* ATTR = ':=' */
-      expr();
-    }
-  }
+	match(ID);
+	if (lookahead == '(') {
+		param();
+	} else {
+		indexing();
+		if (lookahead == ATTR) {
+			match(ATTR);/* ATTR = ':=' */
+			expr();
+		}
+	}
 }
 
 /*
@@ -315,29 +315,29 @@ void idstmt(void)
 void indexing(void)
 {
 q0:
-  if (lookahead == '[') {
-    match('[');
-    expr();
-    match(']');
-    goto q0;
-  }
+	if (lookahead == '[') {
+		match('[');
+		expr();
+		match(']');
+		goto q0;
+	}
 }
 
 /*
  * parm -> '(' [ ')' | exprlst ')']
  */
-/**OBS: exprlst é opcional**/
+/**OBS: exprlst e opcional**/
 void param(void)
 {
-  if (lookahead == '(') {
-    match('(');
-    if (lookahead == ')') {
-      match(')');
-    } else {
-      exprlst();
-      match(')');
-    }
-  }
+	if (lookahead == '(') {
+		match('(');
+		if (lookahead == ')') {
+			match(')');
+		} else {
+			exprlst();
+			match(')');
+		}
+	}
 }
 
 /*
@@ -346,11 +346,11 @@ void param(void)
 void exprlst(void)
 {
 q0:
-  expr();
-  if (lookahead == ',') {
-    match(',');
-    goto q0;
-  }
+	expr();
+	if (lookahead == ',') {
+		match(',');
+		goto q0;
+	}
 }
 
 /******************************************************************************
@@ -373,82 +373,90 @@ q0:
 */
 void expr(void)
 {
-  E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
+	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
 
-E:E_lvl++;
+E:
+	E_lvl++;
 
-  switch (lookahead) {		/* inversão de sinal ('-') e negação (NOT) */
-    case '-':
-    case NOT:
-      match(lookahead);
-      break;
-  }
+	switch (lookahead) {/* inversao de sinal ('-') e negativo (NOT) */
+	case '-':
+	case NOT:
+		match(lookahead);
+		break;
+	}
 
-T:T_lvl++;
+T:
+	T_lvl++;
 
-R:R_lvl++;
+R:
+	R_lvl++;
 
-F:F_lvl++;
+F:
+	F_lvl++;
 
-  switch (lookahead) {
-    case ID:
-      match(ID);
-      if (lookahead == '(') {
-	param();
-      }
-		/**OBS: indexing é opcional**/
-      indexing();
-      break;
-    /**************************************************************************
-    *** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
-    **************************************************************************/
-    case TRUE:
-    case FALSE:
-    case INT_CTE:
-    case REAL_CTE:
-    case DBL_CTE:
-    case STR_CTE:
-      match(lookahead);
-      break;
-    /**************************************************************************
-     *** End of Constants defitions *******************************************
-     *************************************************************************/
-    case '(':
-      match('(');
-      goto E;
-    default:
-      /* se não for nenhum dos esperados, então não faz parte da gramática,
-       * sai com erro para não ficar tavado em 'loop' */
-      err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
-  }
+	switch (lookahead) {
+	case ID:
+		match(ID);
+		if (lookahead == '(') {
+			param();
+		}
+		/**OBS: indexing e opcional**/
+		indexing();
+		break;
+		/**************************************************************************
+		*** Constants defs goes next: INTEGER | REAL | DOUBLE | BOOLEAN | STRING **
+		**************************************************************************/
+	case TRUE:
+	case FALSE:
+	case INT_CTE:
+	case REAL_CTE:
+	case DBL_CTE:
+	case STR_CTE:
+		match(lookahead);
+		break;
+		/**************************************************************************
+		 *** End of Constants defitions *******************************************
+		 *************************************************************************/
+	case '(':
+		match('(');
+		goto E;
+	default:
+		/* se nao for nenhum dos esperados, entao nao faz parte da gramatica,
+		 * sai com erro para nao ficar tavado em 'loop' */
+		err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
+	}
 
-_F:F_lvl--;
+_F:
+	F_lvl--;
 
-  if (isrelop(lookahead)) {
-    match(lookahead);
-    goto R;
-  }
+	if (isrelop(lookahead)) {
+		match(lookahead);
+		goto R;
+	}
 
-_R:R_lvl--;
+_R:
+	R_lvl--;
 
-  if (ismulop(lookahead)) {
-    match(lookahead);
-    goto F;
-  }
+	if (ismulop(lookahead)) {
+		match(lookahead);
+		goto F;
+	}
 
-_T:T_lvl--;
+_T:
+	T_lvl--;
 
-  if (isaddop(lookahead)) {
-    match(lookahead);
-    goto T;
-  }
+	if (isaddop(lookahead)) {
+		match(lookahead);
+		goto T;
+	}
 
-_E:E_lvl--;
+_E:
+	E_lvl--;
 
-  if (E_lvl > -1) {
-    match(')');
-    goto _F;
-  }
+	if (E_lvl > -1) {
+		match(')');
+		goto _F;
+	}
 }
 
 /*
@@ -456,16 +464,16 @@ _E:E_lvl--;
  */
 ismulop(const token_t token)
 {
-  switch (token) {
-    case '*':
-    case '/':
-    case DIV:
-    case MOD:
-    case AND:
-      return 1;
-    default:
-      return 0;
-  }
+	switch (token) {
+	case '*':
+	case '/':
+	case DIV:
+	case MOD:
+	case AND:
+		return 1;
+	default:
+		return 0;
+	}
 }
 
 /*
@@ -473,14 +481,14 @@ ismulop(const token_t token)
  */
 isaddop(const token_t token)
 {
-  switch (token) {
-    case '+':
-    case '-':
-    case OR:
-      return 1;
-    default:
-      return 0;
-  }
+	switch (token) {
+	case '+':
+	case '-':
+	case OR:
+		return 1;
+	default:
+		return 0;
+	}
 }
 
 /*
@@ -488,15 +496,15 @@ isaddop(const token_t token)
  */
 isrelop(const token_t token)
 {
-  switch (token) {
-    case EQ:
-    case NEQ:
-    case GRT:
-    case GEQ:
-    case LSR:
-    case LEQ:
-      return 1;
-    default:
-      return 0;
-  }
+	switch (token) {
+	case EQ:
+	case NEQ:
+	case GRT:
+	case GEQ:
+	case LSR:
+	case LEQ:
+		return 1;
+	default:
+		return 0;
+	}
 }
