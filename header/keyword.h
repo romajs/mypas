@@ -52,7 +52,7 @@ static const char *keywords_lexeme[] = {
 	FOREACH_ENUM(GENERATE_STRING)
 };
 
-#endif // KEYWORD_H
+#endif /* KEYWORD_H */
 
 typedef enum keywords keyword;
 

@@ -134,7 +134,7 @@ q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
 		match('[');
-		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
+		match(INT_CTE); /* Our INT_CTE is already UNSIGNED! */
 		match(']');
 		match(OF);
 		goto q0;
@@ -165,7 +165,7 @@ int smptype(void)
 		match(STRING);
 		return 5;
 	default:
-		// ERROR TYPE
+		/* ERROR TYPE */
 		return -1;
 	}
 }
@@ -253,7 +253,7 @@ void forstmt(void)
 	match(FOR);
 	match(ID);
 	indexing();
-	match(ATTR); // ':='
+	match(ATTR); /* ':=' */
 	expr();
 	if(lookahead == TO) {
 		match(TO);
@@ -286,7 +286,7 @@ void idstmt(void)
 	} else {
 		indexing();
 		if(lookahead == ATTR) {
-			match(ATTR); // ATTR = ':='
+			match(ATTR); /* ATTR = ':=' */
 			expr();
 		}
 	}
@@ -356,7 +356,7 @@ void expr(void)
 
 	E: E_lvl++;
 
-	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
+	switch(lookahead) { /* inversão de sinal ('-') e negação (NOT) */
     case '-':
     case NOT:      
       match(lookahead);

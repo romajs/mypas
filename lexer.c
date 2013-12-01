@@ -65,7 +65,7 @@ token_t isID(FILE *tape)
 token_t isNUM_CTE(FILE *tape)
 {
 	token_t head;
-	int i = 0; // lexeme pos
+	int i = 0; /* lexeme position */
 	int digits = 0;
 	int precision = 0;
 	int exponent = 0;
