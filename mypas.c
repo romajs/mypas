@@ -14,6 +14,7 @@ main(int argc, char *argv[])
       lookahead = gettoken(source);    
       mypas();      
       fprintf(stdout, "Compilation successful for file \"%s\".\n", argv[i]);
+      fclose(stdout);
     }  
   } else {  
     /* call gramar initial symbol */
