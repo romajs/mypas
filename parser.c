@@ -192,7 +192,7 @@ q0:
 void typespec(SEMANTIC_ATTRIB *satrb)
 {	
 	/*sa*/satrb->indirections = 0;/**/
-	/*sa*/satrb->type = 0;/**/ // CUIDADO CONFUNDIR COM PROCEDURE!!!
+	/*sa*/satrb->type = 0;/* CUIDADO CONFUNDIR COM PROCEDURE!!! */
 q0:
 	if(lookahead == ARRAY) {
 		match(ARRAY);
@@ -201,7 +201,7 @@ q0:
 			err(FATAL, LEXICAL, "Max indirections size overflow.\n");
 		}/**/
 		/*sa*/satrb->dimension[satrb->indirections++] = atoi(lexeme);/**/
-		match(INT_CTE); // Our INT_CTE is already UNSIGNED!
+		match(INT_CTE); /* Our INT_CTE is already UNSIGNED! */
 		match(']');
 		match(OF);
 		goto q0;
@@ -232,7 +232,7 @@ int smptype(void)
 		match(STRING);
 		return 5;
 	default:
-		// ERROR TYPE
+		/* ERROR TYPE */
 		return -1;
 	}
 }
@@ -321,7 +321,7 @@ void forstmt(void)
   int entry = symtab_retrieve(lexeme, 0);
 	match(ID);
 	indexing(symtab[entry].indirections);
-	match(ATTR); // ':='
+	match(ATTR); /* ':=' */
 	expr();
 	if(lookahead == TO) {
 		match(TO);
@@ -355,7 +355,7 @@ void idstmt(void)
 	} else {
 		indexing(symtab[entry].indirections);
 		if(lookahead == ATTR) {
-			match(ATTR); // ATTR = ':='
+			match(ATTR); /* ATTR = ':=' */
 			expr();
 		}
 	}
@@ -451,7 +451,7 @@ void expr(void)
 
 	E: E_lvl++;
 
-	switch(lookahead) { // inversão de sinal ('-') e negação (NOT)
+	switch(lookahead) { /* inversão de sinal ('-') e negação (NOT) */
     case '-':
     case NOT:
       
@@ -494,7 +494,7 @@ void expr(void)
       match('(');
       goto E;
     default:
-      // se não for nenhum dos esperados, então não faz parte da gramática
+      /* se não for nenhum dos esperados, então não faz parte da gramática */
       err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
  
