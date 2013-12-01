@@ -1,8 +1,6 @@
 # mypas :: Compiladores UNESP @ RC /2013
 Professor: Eraldo Pereira Marinho
 
-Repositório disponível em: https://github.com/romajs/mypas
-
 ### Grupo 03 ~ Noturno
 - André Cantelli  
 - Daniel Felipe Lucas  
@@ -33,7 +31,7 @@ O programa aceita duas diretivas (argumentos):
 - `-d` modo debug, todo os passos serão exibidos na saída padrão;
 - `-t` modo de testes, executa diversos testes pré-definidos no início do programa;
 
-## Sintax:
+## Sintaxe:
 
 mypas -> PROGRAM ID ';' { specification } stmblk '.'
 
