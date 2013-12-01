@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <symtab.h>
+#include <header/symtab.h>
 
 SEMANTIC_ATTRIB symtab[MAX_SYMTAB_ENTRIES+1];
 

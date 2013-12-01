@@ -1,5 +1,5 @@
-#include <error.h>
-#include <parser.h>
+#include <header/error.h>
+#include <header/parser.h>
 
 /* main interface */
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <tokens.h>
+#include <header/tokens.h>
 
 #ifndef SYMTAB_H
 #define SYMTAB_H

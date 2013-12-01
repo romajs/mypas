@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include <lexer.h>
-#include <symtab.h>
+#include <header/lexer.h>
+#include <header/symtab.h>
 
 extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 extern int id_count;
