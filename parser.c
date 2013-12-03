@@ -486,13 +486,15 @@ q0:
 void expr(void)
 { 	
 	E_lvl = -1, R_lvl = -1, T_lvl = -1, F_lvl = -1;
+	sp = -1, opsp = -1;
 
 	E: E_lvl++;
 
 	switch(lookahead) { /* inversão de sinal ('-') e negação (NOT) */
     case '-':
+		/*push_operand(INT_CTE, "0");*/
     case NOT:
-      
+      /*push_oper(lookahead, E_lvl);*/
       match(lookahead);
       break;
 	}
@@ -523,6 +525,7 @@ void expr(void)
     case REAL_CTE:
     case DBL_CTE:
     case STR_CTE:
+		/*push_operand(lookahead, lexeme);*/
       match(lookahead);
       break;
     /**************************************************************************
@@ -535,6 +538,8 @@ void expr(void)
       /* se não for nenhum dos esperados, então não faz parte da gramática */
       err(FATAL, LEXICAL, "Token mismatch \"%s\"\n", lexeme);
 	}	
+	
+	/* exec_oper(); /* execucao de operacoes agendadas na pilha */
  
 	_F: F_lvl--;
   
@@ -542,13 +547,17 @@ void expr(void)
 		match(lookahead);
 		goto R;
 	}
- 
+	
+	/* exec_oper(); /* execucao de operacoes agendadas na pilha */
+	
 	_R: R_lvl--;
 
 	if(ismulop(lookahead)) {
 		match(lookahead);
 		goto F;
 	}
+	
+	/* exec_oper(); /* execucao de operacoes agendadas na pilha */
 
 	_T: T_lvl--;
 
@@ -556,6 +565,8 @@ void expr(void)
 		match(lookahead);
 		goto T;
 	}
+	
+	/* exec_oper(); /* execucao de operacoes agendadas na pilha */
 
 	_E: E_lvl--;
 

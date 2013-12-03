@@ -2,6 +2,7 @@
 
 #include <header/lexer.h>
 #include <header/symtab.h>
+#include <header/typecheck.h>
 
 extern char id_list[MAX_SYMTAB_ENTRIES][MAX_ID_SIZE + 1];
 extern int id_count;
@@ -202,3 +203,15 @@ extern void stepc(int, const char*);
 extern void inc(const char*);
 
 extern void dec(const char*);
+
+/* typecheck interface */
+
+extern int opsp;
+
+extern int sp;
+
+void push_operand(token_t, const char *);
+
+void push_oper(token_t, int);
+
+extern void exec_oper(void);
